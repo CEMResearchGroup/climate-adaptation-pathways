@@ -16,7 +16,8 @@
      their own); the end of one dissolves into the start of the next. A click (or →, Space, PageDown) moves on, the
      left side of the picture (or ←, PageUp) goes back. This page adds the navigation bar at the bottom: restart, back,
      the progress line (a station per scene, a bead per section), forward, full screen; it folds away to a small tab.
-     A second full-screen button sits in the top-right corner (visible with the bar folded away, hidden in full screen). */
+     A second full-screen button sits in the top-right corner (visible with the bar folded away, hidden in full screen).
+     In full screen the bar leaves the picture; the mouse at the bottom edge (or N) brings it back. */
   :root { --accent: #43B97D; --accent-rgb: 67, 185, 125; --panel: rgba(0, 44, 80, .84); --ease: cubic-bezier(.65, 0, .35, 1); }   /* COP31 Türkiye: navy #002C50, mint #43B97D */
   html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; }
@@ -69,6 +70,12 @@
   #corner-full:hover { opacity: 1; }
   #corner-full:active { transform: scale(.93); }
   body.full #corner-full { opacity: 0; pointer-events: none; }
+  /* full screen: the bar (tab included) leaves the picture completely; bringing the mouse to the bottom edge brings
+     it back (#hot), moving away hides it again */
+  body.full #nav { transform: translate(-50%, calc(100% + 70px)); }
+  body.full.peek #nav { transform: translateX(-50%); }
+  #hot { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; pointer-events: none; }
+  body.full #hot { pointer-events: auto; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 </style>
 </head>
@@ -80,6 +87,7 @@
   <button id="corner-full" aria-label="Tam ekran">
     <svg viewBox="0 0 24 24" width="30" height="30"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
+  <div id="hot" aria-hidden="true"></div>
   <nav id="nav" aria-label="Climate Adaptation Pathways in the Built Environment">
     <button id="tab" aria-label="Gezinme çubuğunu aç / kapat" aria-expanded="true">
       <svg viewBox="0 0 24 24" width="26" height="26"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -263,18 +271,41 @@ function toggleFull() {
 function fullIcon() {
   const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
   document.body.classList.toggle('full', on);
+  clearTimeout(peekTimer); document.body.classList.remove('peek');   // entering or leaving: start with the bar hidden / as set
   $('full-icon').setAttribute('d', on ? 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5' : 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5');
   $('b-full').setAttribute('aria-label', on ? 'Tam ekrandan çık' : 'Tam ekran');
 }
 $('b-full').addEventListener('click', toggleFull);
 $('corner-full').addEventListener('click', toggleFull);
+
+/* full screen: the bar peeks out while the mouse is at the bottom edge or on the bar, and hides 1.2 s after it leaves.
+   A click on the bottom edge (outside the bar) still moves the presentation, like a click on the picture. */
+let peekTimer = 0;
+const peek = on => {
+  clearTimeout(peekTimer);
+  if (on) document.body.classList.add('peek');
+  else peekTimer = setTimeout(() => document.body.classList.remove('peek'), 1200);
+};
+$('hot').addEventListener('mouseenter', () => peek(true));
+$('hot').addEventListener('mouseleave', () => peek(false));
+nav.addEventListener('mouseenter', () => { if (document.body.classList.contains('full')) peek(true); });
+nav.addEventListener('mouseleave', () => { if (document.body.classList.contains('full')) peek(false); });
+$('hot').addEventListener('click', e => {
+  if (e.pointerType === 'touch') { document.body.classList.toggle('peek'); return; }   // touch: no hover, a tap shows it
+  const r = $('ui').getBoundingClientRect();
+  if ((e.clientX - r.left) / r.width < 0.3) backward(); else forward();
+});
 document.addEventListener('fullscreenchange', fullIcon);
 document.addEventListener('webkitfullscreenchange', fullIcon);
 
 /* keys: F = full screen, N = navigation bar (also when a scene has the focus: it passes them up) */
 function pageKey(key) {
   if (key === 'f' || key === 'F') { toggleFull(); return true; }
-  if (key === 'n' || key === 'N') { setNav(nav.classList.contains('closed')); return true; }
+  if (key === 'n' || key === 'N') {
+    if (document.body.classList.contains('full')) { clearTimeout(peekTimer); document.body.classList.toggle('peek'); }
+    else setNav(nav.classList.contains('closed'));
+    return true;
+  }
   return false;
 }
 // keys pressed while this page (not a scene) has the focus: page keys here, the rest to the scene on screen

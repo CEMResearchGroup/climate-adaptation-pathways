@@ -358,9 +358,14 @@ class Actor {
   loop(key, target, frames, opts = {}) {
     const el = typeof target === 'string' ? (target === '@inner' ? this.inner : this.part(target)) : target;
     if (!el) { this.stop(key, false); return null; }
-    // a big actor that animates inside itself all the time (rain, clouds, flood water…) gets its own layer, so its
-    // repaints do not spill onto the scenery under it; everything else shares layers (graphics memory stays low)
-    if (el !== this.inner && el !== this.el && this.w * this.h >= W * H * 0.25) this.el.style.willChange = 'transform';
+    // an actor whose animated part itself covers a big area (rain, clouds, flood water…) gets its own layer, so its
+    // repaints do not spill onto the scenery under it; small animated bits (rings, arrows, marks) share layers, which
+    // keeps graphics memory low (too many big layers = parts drawn late = flicker, worst when the camera zooms in)
+    if (el !== this.inner && el !== this.el && !this.el.style.willChange) {
+      let area = 0;
+      try { const b = el.getBBox(); area = (b.width * this.w / this.vw) * (b.height * this.h / this.vh); } catch (e) { /* not drawable */ }
+      if (area >= W * H * 0.25) this.el.style.willChange = 'transform';
+    }
     const { ease: easeOpt, ...o } = opts;
     const ease = easeOpt ?? ((o.duration || 1000) < 250 ? 0 : 400);
     let from = null;
