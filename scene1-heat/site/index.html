@@ -262,6 +262,7 @@ function inlineSVG(name, prefix) {
   const src = ASSETS[name];
   if (!src) throw new Error('missing asset ' + name);
   return src
+    .replace(/<title>[\s\S]*?<\/title>/g, '')          // the library's names would show as tooltips: the scenes stay wordless
     .replace(/\sid="/g, ` id="${prefix}`)
     .replace(/url\(#/g, `url(#${prefix}`)
     .replace(/href="#/g, `href="#${prefix}`);

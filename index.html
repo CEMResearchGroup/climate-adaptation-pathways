@@ -50,18 +50,19 @@
     box-shadow: 0 0 0 1px rgba(var(--blue-rgb), .14), 0 8px 26px rgba(0, 30, 70, .16); }
   .chrome { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; cursor: pointer;
     color: var(--text); background: #fff url(intro/assets/tpl-swirl.webp) center / cover no-repeat; }
-  .chrome .band { position: absolute; left: 0; top: 0; width: 1920px; height: 152px; background: url(intro/assets/tpl-band.webp) center / 100% 100% no-repeat; }
-  .chrome h2 { position: absolute; left: 72px; top: 0; height: 152px; margin: 0; display: flex; align-items: center;
-    font-family: 'Outfit', system-ui, sans-serif; font-size: 52px; font-weight: 700; color: #fff; }
-  .chrome .notice { position: absolute; left: 84px; top: 945px; width: 1367px; font-size: 16px; line-height: 1.3; }
+  /* a slimmer band and footer than the text slides', so the animation gets most of the slide (1600 of 1920 px) */
+  .chrome .band { position: absolute; left: 0; top: 0; width: 1920px; height: 92px; background: url(intro/assets/tpl-band.webp) center / 100% 100% no-repeat; }
+  .chrome h2 { position: absolute; left: 60px; top: 0; height: 92px; margin: 0; display: flex; align-items: center;
+    font-family: 'Outfit', system-ui, sans-serif; font-size: 42px; font-weight: 700; color: #fff; }
+  .chrome .notice { position: absolute; left: 84px; top: 1014px; width: 1436px; font-size: 12.5px; line-height: 1.3; }
   .chrome .notice p { margin: 0; }
-  .chrome .cop31 { position: absolute; left: 1476px; top: 972px; width: 196px; height: 79px; background: url(intro/assets/tpl-cop31-logo.webp) center / contain no-repeat; }
-  .chrome .vline { position: absolute; left: 1697px; top: 972px; width: 3px; height: 79px; background: var(--blue); }
-  .chrome .yok { position: absolute; left: 1721px; top: 951px; width: 162px; height: 80px; background: url(intro/assets/tpl-yok-logo.webp) center / contain no-repeat; }
+  .chrome .cop31 { position: absolute; left: 1550px; top: 1012px; width: 150px; height: 60px; background: url(intro/assets/tpl-cop31-logo.webp) center / contain no-repeat; }
+  .chrome .vline { position: absolute; left: 1715px; top: 1012px; width: 3px; height: 60px; background: var(--blue); }
+  .chrome .yok { position: absolute; left: 1733px; top: 1012px; width: 122px; height: 60px; background: url(intro/assets/tpl-yok-logo.webp) center / contain no-repeat; }
 
   /* ---- navigation strip under the slide: plain, in the template's blue and green */
-  #nav { position: fixed; left: 50%; bottom: 0; height: 68px; transform: translateX(-50%); display: flex; align-items: center; z-index: 10; }
-  #bar { display: flex; align-items: center; gap: 8px; padding: 0 10px; height: 52px; border-radius: 26px;
+  #nav { position: fixed; left: 50%; bottom: 0; height: 58px; transform: translateX(-50%); display: flex; align-items: center; z-index: 10; }
+  #bar { display: flex; align-items: center; gap: 8px; padding: 0 10px; height: 50px; border-radius: 25px;
     transition: background .3s, box-shadow .3s; }
   .nb { width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; flex: none; color: var(--blue);
     background: transparent; display: grid; place-items: center; transition: background .2s, opacity .2s, transform .15s; }
@@ -374,10 +375,10 @@ addEventListener('keydown', e => {
 
 /* the slide (16:9) in the outer frame above the strip; full screen: the whole screen. A scene's animation window sits
    in the middle of its slide, between the band and the notice, exactly 16:9 so the scene fills it without bars. */
-const WIN = { top: 176, h: 747 };                      // in slide pixels (1920 × 1080): 1328 × 747, centred
+const WIN = { top: 104, h: 900 };                      // in slide pixels (1920 × 1080): 1600 × 900, centred
 function fit() {
   const full = body.classList.contains('full'), closed = body.classList.contains('closed');
-  const pad = full ? 0 : 20, strip = full ? 0 : closed ? 26 : 68;
+  const pad = full ? 0 : 12, strip = full ? 0 : closed ? 24 : 58;
   const aw = innerWidth - 2 * pad, ah = innerHeight - pad - strip;
   const s = Math.max(0.05, Math.min(aw / 1920, ah / 1080));
   const w = Math.round(1920 * s), h = Math.round(1080 * s);
