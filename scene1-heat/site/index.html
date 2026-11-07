@@ -28,6 +28,9 @@ body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #ff
 .actor .inner, .actor .flipper { position: relative; width: 100%; height: 100%; }
 .actor .flipper.flip { transform: scaleX(-1); }
 .actor svg { display: block; }
+/* the crane's hoist ropes above a lowered hook (story.js A.cable): the two ropes of machinery/crane-load (x 64 and 76,
+   2 px, #222B3A) continued from the trolley down to the hook block, so they never break off when the hook goes down */
+.cable { position: absolute; width: 14px; box-sizing: border-box; border-left: 2px solid #222B3A; border-right: 2px solid #222B3A; pointer-events: none; }
 .night-tint { filter: brightness(.86) saturate(.9); }
 .night-plant { filter: brightness(.62) saturate(.85) hue-rotate(8deg); }
 
