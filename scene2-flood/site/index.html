@@ -509,8 +509,11 @@ const SPLASH_R = [[20, 781], [180, 739], [120, 695], [760, 770], [940, 733], [99
   .map(([u, gy]) => [lineR(u, gy), gy]);
 /* right street furniture (ground y, far → near): trees in the planting strip, street lamps on the sidewalk */
 const LAMPS = [645, 672, 706, 750, 790];               // the nearest stands in front of every tree, so its head reads clearly
-const TREES = [632, 647, 668, 695, 732, 789];
-const LAMP_U = 780, TREE_U = 560;                     // x800 lines: sidewalk 640-1050 (façades at 1050), strip 385-640
+const TREES = [647, 668, 695, 732, 789];
+const LAMP_U = 780, TREE_U = 520;                     // x800 lines: sidewalk 640-1050 (façades at 1050), strip 385-640
+/* the trees stand on the road side of the strip and stay modest (TREE_K of full size), so their crowns sit in front of
+   the street and the sidewalk, not over the shop fronts (they looked as if they grew out of the buildings) */
+const TREE_K = 0.78, ROOT_K = 0.85;                  // the roots shrink with them and stay inside the cut
 
 /* Camera views: world rect {x, y, w}; height follows 16:9 (at most 1.5× zoom) */
 const CAM = {
@@ -655,8 +658,8 @@ function buildScene() {
   ['plants-far', 'plants-near'].forEach(n => { const p = A.garden.part(n); p.style.opacity = 0; p.style.transform = 'scale(0.2)'; });
   setT(A.garden, 'roots', 'scaleY(0)');
   // the roots of the nearest street tree, in the cut under its trunk (grow in top → down)
-  m(Lr, 'roots', 'drainage/tree-roots', lineR(TREE_U, TREES[TREES.length - 1]) - 120, 800);
-  A.roots.el.style.clipPath = 'inset(0px 0px 130px 0px)';
+  m(Lr, 'roots', 'drainage/tree-roots', lineR(TREE_U, TREES[TREES.length - 1]) - 120 * ROOT_K, 800, { w: 240 * ROOT_K, h: 130 * ROOT_K });
+  A.roots.el.style.clipPath = `inset(0px 0px ${130 * ROOT_K}px 0px)`;
   // what the grey option costs in material and earthwork: the trench dug for the new main (drawn under it)
   m(Lr, 'pit', 'drainage/main-trench', 1205, 868);
   A.pit.el.style.clipPath = 'inset(0px 0px 186px 0px)';
@@ -683,7 +686,7 @@ function buildScene() {
   A.lamps = LAMPS.map(gy => stand(OBJ, 'street/street-lamp', 80, 360, lineR(LAMP_U, gy), gy, sR(gy)));
   A.trees = TREES.map(gy => {
     const s = sR(gy), t = stand(OBJ, 'nature/street-tree', 240, 420, lineR(TREE_U, gy), gy, s * 0.25, { o: 0 });
-    t.s0 = s;
+    t.s0 = s * TREE_K;
     return t;
   });
   const tr = track('R', 880, 762, 644);
