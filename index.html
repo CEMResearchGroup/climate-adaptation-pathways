@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COP31 · Sunum</title>
+<meta name="description" content="COP31 iklim uyumu animasyonları: sıcak hava stresi ve kentsel sel — bugünkü durum ve önlemler.">
+<meta name="theme-color" content="#0B1020">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%23FFB300'/%3E%3C/svg%3E">
+<style>
+  /* One presentation: the scene sites play back to back, each in its own frame (opened with ?embed: no buttons of
+     their own); the end of one dissolves into the start of the next. A click (or →, Space, PageDown) moves on, the
+     left side of the picture (or ←, PageUp) goes back. This page adds the navigation bar at the bottom: restart, back,
+     the progress line (a station per scene, a bead per section), forward, full screen; it folds away to a small tab. */
+  :root { --yellow: #F5B70A; --panel: rgba(17, 25, 48, .74); --ease: cubic-bezier(.65, 0, .35, 1); }
+  html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; visibility: hidden; }
+  iframe.on { visibility: visible; }
+  /* overlay on the same 1920×1080 stage the scenes use */
+  #ui { position: fixed; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; pointer-events: none; z-index: 10; }
+
+  /* ---- navigation bar: docked at the bottom centre, folds down out of the picture leaving only its tab */
+  #nav { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); transition: transform .5s var(--ease); pointer-events: auto; }
+  #nav.closed { transform: translate(-50%, calc(100% + 22px)); }
+  #tab { position: absolute; left: 50%; top: -36px; transform: translateX(-50%); width: 96px; height: 36px; border: 0; padding: 0;
+    border-radius: 18px 18px 0 0; background: var(--panel); color: #fff; cursor: pointer; display: grid; place-items: center;
+    opacity: .8; transition: opacity .3s; }
+  #nav.closed #tab { opacity: .45; }
+  #tab:hover, #nav.closed #tab:hover { opacity: 1; }
+  #tab svg { transition: transform .5s var(--ease); }
+  #nav.closed #tab svg { transform: rotate(180deg); }
+  #bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--panel); border-radius: 26px;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, .35); }
+  .nb { width: 58px; height: 58px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; flex: none; color: #fff;
+    background: rgba(255, 255, 255, .09); display: grid; place-items: center; transition: background .25s, opacity .25s, transform .15s; }
+  .nb:hover { background: rgba(255, 255, 255, .2); }
+  .nb:active { transform: scale(.93); }
+  .nb.big { width: 66px; height: 66px; background: rgba(245, 183, 10, .2); box-shadow: inset 0 0 0 3px rgba(245, 183, 10, .75); }
+  .nb.big:hover { background: rgba(245, 183, 10, .34); }
+  .nb:disabled { opacity: .28; cursor: default; background: rgba(255, 255, 255, .06); box-shadow: none; }
+  .sep { width: 2px; height: 40px; border-radius: 1px; background: rgba(255, 255, 255, .16); flex: none; }
+
+  /* progress line: a station (scene icon) per scene, a bead per section */
+  #line { display: flex; align-items: center; padding: 0 6px; }
+  .st { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none;
+    background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .35); transition: background .4s, box-shadow .4s, transform .4s; }
+  .st svg { width: 32px; height: 32px; display: block; opacity: .55; transition: opacity .4s; }
+  .st.done { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .9); }
+  .st.done svg, .st.cur svg { opacity: 1; }
+  .st.cur { background: rgba(245, 183, 10, .22); box-shadow: inset 0 0 0 3px var(--yellow); transform: scale(1.08); }
+  .bd { width: 16px; height: 16px; border-radius: 50%; flex: none; cursor: pointer; background: rgba(255, 255, 255, .35);
+    transition: background .4s, transform .4s; }
+  .bd.done { background: rgba(255, 255, 255, .85); }
+  .bd.cur { background: var(--yellow); transform: scale(1.35); }
+  .seg { width: 12px; height: 3px; flex: none; background: rgba(255, 255, 255, .28); transition: background .4s; }
+  .seg.long { width: 30px; }
+  .seg.done { background: rgba(255, 255, 255, .8); }
+  .st:hover, .bd:hover { filter: brightness(1.25); }
+  button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<iframe id="f0" class="on" src="scene1-heat/site/index.html?embed" title="1"></iframe>
+<iframe id="f1" src="scene2-flood/site/index.html?embed" title="2"></iframe>
+<div id="ui">
+  <nav id="nav" aria-label="Sunum">
+    <button id="tab" aria-label="Gezinme çubuğunu aç / kapat" aria-expanded="true">
+      <svg viewBox="0 0 24 24" width="26" height="26"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div id="bar">
+      <button class="nb" id="b-restart" aria-label="Baştan başla">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 12a8 8 0 1 0 2.4-5.7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M4 3v5h5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <i class="sep"></i>
+      <button class="nb big" id="b-prev" aria-label="Geri">
+        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="line" aria-hidden="true"></div>
+      <button class="nb big" id="b-next" aria-label="İleri">
+        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M9.5 5.5L16 12l-6.5 6.5" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <i class="sep"></i>
+      <button class="nb" id="b-full" aria-label="Tam ekran">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path id="full-icon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+<script>
+/* station badges: the library's sun (scene 1, heat) and heavy rain (scene 2, flood) icons */
+const ICONS = [
+  '<svg viewBox="0 0 80 80"><g stroke="#FFB300" stroke-width="5" stroke-linecap="round"><line x1="61" y1="40" x2="68" y2="40"/><line x1="54.8" y1="54.8" x2="59.8" y2="59.8"/><line x1="40" y1="61" x2="40" y2="68"/><line x1="25.2" y1="54.8" x2="20.2" y2="59.8"/><line x1="19" y1="40" x2="12" y2="40"/><line x1="25.2" y1="25.2" x2="20.2" y2="20.2"/><line x1="40" y1="19" x2="40" y2="12"/><line x1="54.8" y1="25.2" x2="59.8" y2="20.2"/></g><circle cx="40" cy="40" r="15" fill="#FFB300"/><circle cx="40" cy="40" r="11" fill="#FFC93C"/></svg>',
+  '<svg viewBox="0 0 80 80"><path d="M22 50A12 12 0 0 1 20.4 26.2A17 17 0 0 1 52.6 20.6A13.5 13.5 0 0 1 58.6 50Z" fill="#B5BDCB"/><path d="M18 50H62" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/><g stroke="#4FA3DB" stroke-width="4.5" stroke-linecap="round"><line x1="27" y1="57" x2="23.6" y2="69"/><line x1="40" y1="57" x2="36.6" y2="69"/><line x1="53" y1="57" x2="49.6" y2="69"/><line x1="33.6" y1="70" x2="32.4" y2="74.4"/><line x1="46.6" y1="70" x2="45.4" y2="74.4"/></g></svg>',
+];
+const $ = id => document.getElementById(id);
+const F = [$('f0'), $('f1')];
+const LAST = F.length - 1;
+const S = F.map(() => ({ chapters: [], beats: 0, beat: -1, busy: false, ended: false }));
+let cur = 0, switching = false;
+
+const send = (i, msg) => F[i].contentWindow.postMessage(Object.assign({ cop31: true }, msg), '*');
+
+/** cross to scene j: prep() puts it in the right state while it is still hidden, then the scene on screen dissolves
+    into it (no black in between, so the scenes read as one continuous piece) */
+async function switchTo(j, prep) {
+  if (switching || j === cur) return;
+  switching = true;
+  render();
+  const from = F[cur], to = F[j];
+  if (prep) prep();
+  await new Promise(r => setTimeout(r, 550));          // the scene's own quick rewind settles behind the one on screen
+  from.style.zIndex = 2; to.style.zIndex = 1;
+  to.classList.add('on');
+  cur = j;
+  render();
+  await from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }).finished;
+  from.classList.remove('on');
+  from.getAnimations().forEach(a => a.cancel());
+  from.style.zIndex = to.style.zIndex = '';
+  switching = false;
+  render();
+}
+const atStart = i => S[i].beat < 0 && !S[i].busy;
+
+/* forward / back: the scene on screen decides (it hands over to the next / previous scene at its ends) */
+const forward = () => { if (!switching && !atEnd()) send(cur, { cmd: 'key', key: 'ArrowRight' }); };
+const backward = () => { if (!switching && !atBegin()) send(cur, { cmd: 'key', key: 'ArrowLeft' }); };
+const atBegin = () => cur === 0 && atStart(0);
+const atEnd = () => cur === LAST && S[LAST].ended;   // the presentation stops here: no accidental jump back to the start
+
+/* a station = the scene's opening shot; a bead = one section, played from its start */
+function goStation(j) {
+  if (j === cur) { send(j, { cmd: 'rewind', to: -1 }); return; }
+  switchTo(j, () => { if (!atStart(j)) send(j, { cmd: 'rewind', to: -1 }); });
+}
+function goBead(j, k) {
+  const from = S[j].chapters[k];
+  if (j === cur) { send(j, { cmd: 'play', from }); return; }
+  switchTo(j, () => send(j, { cmd: 'play', from }));
+}
+function restartAll() {
+  const rewindAll = () => F.forEach((f, i) => { if (!atStart(i)) send(i, { cmd: 'rewind', to: -1 }); });
+  if (cur === 0) rewindAll(); else switchTo(0, rewindAll);
+}
+
+function render() {
+  const line = $('line');
+  if (!line.children.length) {
+    S.forEach((s, j) => {
+      if (j) { const g = document.createElement('i'); g.className = 'seg long'; line.appendChild(g); }
+      const st = document.createElement('i');
+      st.className = 'st'; st.innerHTML = ICONS[j]; st.dataset.scene = j;
+      st.addEventListener('click', () => goStation(j));
+      line.appendChild(st);
+      s.chapters.forEach((_, k) => {
+        const g = document.createElement('i'); g.className = 'seg'; line.appendChild(g);
+        const b = document.createElement('i');
+        b.className = 'bd'; b.dataset.scene = j; b.dataset.k = k;
+        b.addEventListener('click', () => goBead(j, k));
+        line.appendChild(b);
+      });
+    });
+  }
+  // state: everything before the current point is done, the current station / section is yellow
+  const kids = [...line.children];
+  kids.forEach(el => {
+    const j = +el.dataset.scene, s = S[j];
+    if (el.classList.contains('st')) {
+      const opening = s.beat < 0 || s.beat < s.chapters[0];
+      el.className = 'st ' + (j < cur ? 'done' : j > cur ? '' : opening ? 'cur' : 'done');
+    } else if (el.classList.contains('bd')) {
+      const k = +el.dataset.k;
+      const now = s.chapters.reduce((a, b, i) => (s.beat >= b ? i : a), -1);
+      el.className = 'bd ' + (j < cur ? 'done' : j > cur ? '' : k < now ? 'done' : k === now ? 'cur' : '');
+    }
+  });
+  // a stretch of line is lit once the station / bead after it is reached
+  kids.forEach(el => {
+    if (el.classList.contains('seg')) el.classList.toggle('done', /\b(done|cur)\b/.test(el.nextElementSibling.className));
+  });
+  $('b-prev').disabled = atBegin();
+  $('b-next').disabled = atEnd();
+}
+
+addEventListener('message', e => {
+  const i = F.findIndex(f => f.contentWindow === e.source);
+  const m = e.data || {};
+  if (i < 0 || !m.cop31) return;
+  if (m.type === 'meta') { S[i].chapters = m.chapters; S[i].beats = m.beats; $('line').innerHTML = ''; render(); }
+  else if (m.type === 'state') { Object.assign(S[i], { beat: m.beat, busy: m.busy, ended: m.ended }); render(); }
+  else if (m.type === 'next' && i === cur && cur < LAST) {
+    switchTo(cur + 1, () => { if (!atStart(cur + 1)) send(cur + 1, { cmd: 'rewind', to: -1 }); });
+  } else if (m.type === 'prev' && i === cur && cur > 0) {
+    const j = cur - 1;
+    switchTo(j, () => { if (!S[j].ended) send(j, { cmd: 'rewind', to: S[j].beats - 1 }); });
+  } else if (m.type === 'key' && i === cur) pageKey(m.key);
+});
+
+/* ---- navigation bar */
+const nav = $('nav');
+function setNav(open) {
+  nav.classList.toggle('closed', !open);
+  $('tab').setAttribute('aria-expanded', String(open));
+  try { localStorage.setItem('cop31-nav', open ? 'open' : 'closed'); } catch (err) { /* private mode: not remembered */ }
+}
+try { if (localStorage.getItem('cop31-nav') === 'closed') setNav(false); } catch (err) { /* ignore */ }
+$('tab').addEventListener('click', () => setNav(nav.classList.contains('closed')));
+$('b-prev').addEventListener('click', backward);
+$('b-next').addEventListener('click', forward);
+$('b-restart').addEventListener('click', restartAll);
+
+function toggleFull() {
+  const d = document, el = d.documentElement;
+  if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+}
+function fullIcon() {
+  const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  $('full-icon').setAttribute('d', on ? 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5' : 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5');
+  $('b-full').setAttribute('aria-label', on ? 'Tam ekrandan çık' : 'Tam ekran');
+}
+$('b-full').addEventListener('click', toggleFull);
+document.addEventListener('fullscreenchange', fullIcon);
+document.addEventListener('webkitfullscreenchange', fullIcon);
+
+/* keys: F = full screen, N = navigation bar (also when a scene has the focus: it passes them up) */
+function pageKey(key) {
+  if (key === 'f' || key === 'F') { toggleFull(); return true; }
+  if (key === 'n' || key === 'N') { setNav(nav.classList.contains('closed')); return true; }
+  return false;
+}
+// keys pressed while this page (not a scene) has the focus: page keys here, the rest to the scene on screen
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (pageKey(e.key)) { e.preventDefault(); return; }
+  const k = e.key;
+  if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(k)) { e.preventDefault(); forward(); }
+  else if (['ArrowLeft', 'Backspace', 'PageUp'].includes(k)) { e.preventDefault(); backward(); }
+  else if (['1', '2', '3', '4'].includes(k)) { e.preventDefault(); if (!switching) send(cur, { cmd: 'key', key: k }); }
+});
+
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $('ui').style.transform = `translate(${(innerWidth - 1920 * s) / 2}px, ${(innerHeight - 1080 * s) / 2}px) scale(${s})`;
+}
+fit(); addEventListener('resize', fit);
+render();
+F[0].addEventListener('load', () => F[0].focus());
+</script>
+</body>
+</html>
