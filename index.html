@@ -113,28 +113,49 @@ const ICONS = [
 const $ = id => document.getElementById(id);
 const F = [$('f0'), $('f1'), $('f2')];
 const LAST = F.length - 1;
-const S = F.map(() => ({ chapters: [], beats: 0, beat: -1, busy: false, ended: false }));
+const S = F.map(() => ({ chapters: [], beats: 0, beat: -1, busy: false, ended: false, rewinding: false }));
 let cur = 0, switching = false;
 
-const send = (i, msg) => F[i].contentWindow.postMessage(Object.assign({ cop31: true }, msg), '*');
+const send = (i, msg) => {
+  if (msg.cmd === 'rewind' || msg.cmd === 'play') { S[i].rewinding = true; asleep[i] = false; }   // until the scene reports back (then it may sleep again)
+  F[i].contentWindow.postMessage(Object.assign({ cop31: true }, msg), '*');
+};
 
 /** cross to scene j: prep() puts it in the right state while it is still hidden, then the scene on screen dissolves
     into it (no black in between, so the scenes read as one continuous piece) */
+let incoming = -1;                                     // the scene being switched to (awake, not yet on screen)
+const asleep = F.map(() => false);
+const sleep = i => { if (!asleep[i]) { asleep[i] = true; send(i, { cmd: 'sleep' }); } };
+const wake = i => { asleep[i] = false; send(i, { cmd: 'wake' }); };
+/** resolves once scene j has finished a rewind (it reports rewinding: false), or after `ms` at the latest */
+function ready(j, ms) {
+  return new Promise(res => {
+    const t0 = performance.now();
+    const check = () => (!S[j].rewinding && performance.now() - t0 > 120) || performance.now() - t0 > ms ? res() : setTimeout(check, 40);
+    check();
+  });
+}
 async function switchTo(j, prep) {
   if (switching || j === cur) return;
   switching = true;
+  incoming = j;
   render();
-  const from = F[cur], to = F[j];
-  if (prep) prep();
-  await new Promise(r => setTimeout(r, 550));          // the scene's own quick rewind settles behind the one on screen
+  const from = F[cur], to = F[j], fromIdx = cur;
+  wake(j);
+  // the incoming scene is drawn right away, hidden under the one on screen, so the dissolve never starts on an empty frame
   from.style.zIndex = 2; to.style.zIndex = 1;
   to.classList.add('on');
+  if (prep) prep();
+  await ready(j, 4000);
+  await new Promise(r => setTimeout(r, prep ? 360 : 120)); // its own short fade-in after a rewind is over
   cur = j;
   render();
   await from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }).finished;
   from.classList.remove('on');
   from.getAnimations().forEach(a => a.cancel());
   from.style.zIndex = to.style.zIndex = '';
+  sleep(fromIdx);                                        // off screen now: costs nothing until it is needed again
+  incoming = -1;
   switching = false;
   render();
 }
@@ -204,8 +225,13 @@ addEventListener('message', e => {
   const i = F.findIndex(f => f.contentWindow === e.source);
   const m = e.data || {};
   if (i < 0 || !m.cop31) return;
-  if (m.type === 'meta') { S[i].chapters = m.chapters; S[i].beats = m.beats; $('line').innerHTML = ''; render(); }
-  else if (m.type === 'state') { Object.assign(S[i], { beat: m.beat, busy: m.busy, ended: m.ended }); render(); }
+  const hidden = i !== cur && i !== incoming;
+  if (m.type === 'meta') { S[i].chapters = m.chapters; S[i].beats = m.beats; $('line').innerHTML = ''; render(); if (hidden) sleep(i); }
+  else if (m.type === 'state') {
+    Object.assign(S[i], { beat: m.beat, busy: m.busy, ended: m.ended, rewinding: !!m.rewinding });
+    render();
+    if (hidden && !m.rewinding) sleep(i);                // e.g. after ↻ rewound a scene that is not on screen
+  }
   else if (m.type === 'next' && i === cur && cur < LAST) {
     switchTo(cur + 1, () => { if (!atStart(cur + 1)) send(cur + 1, { cmd: 'rewind', to: -1 }); });
   } else if (m.type === 'prev' && i === cur && cur > 0) {

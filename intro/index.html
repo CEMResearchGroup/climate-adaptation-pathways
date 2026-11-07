@@ -170,7 +170,7 @@ const EMBED = new URLSearchParams(location.search).has('embed') && window.parent
 const post = msg => { if (EMBED) window.parent.postMessage(Object.assign({ cop31: true }, msg), '*'); };
 let beat = -1;
 const ended = () => beat === BEATS - 1;
-const report = () => post({ type: 'state', beat, busy: false, ended: ended() });
+const report = () => post({ type: 'state', beat, busy: false, ended: ended(), rewinding: false });
 
 /** show beat b (−1 = cover); play its entrance only when moving forward to it */
 function show(b, play) {
@@ -215,6 +215,9 @@ if (EMBED) {
     if (m.cmd === 'rewind') show(Math.max(-1, Math.min(BEATS - 1, m.to)), false);
     else if (m.cmd === 'play') { show(m.from - 1, false); show(m.from, true); }
     else if (m.cmd === 'key') onKey(m.key);
+    // off screen: pause everything (costs nothing); back on screen: carry on
+    else if (m.cmd === 'sleep') document.getAnimations().forEach(a => { if (a.playState === 'running') a.pause(); });
+    else if (m.cmd === 'wake') document.getAnimations().forEach(a => { if (a.playState === 'paused') a.play(); });
   });
   post({ type: 'meta', chapters: SLIDES.slice(1).map((_, i) => i), beats: BEATS });
 }

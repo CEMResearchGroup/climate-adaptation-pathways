@@ -24,7 +24,8 @@ body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #ff
 #L-rain { clip-path: inset(0 0 280px 0); pointer-events: none; }   /* rain stops at the ground cut (y 800) */
 #L-fx { pointer-events: none; }
 .objs { position: absolute; inset: 0; width: 1920px; height: 1080px; isolation: isolate; }   /* depth-sorted street objects */
-.actor { position: absolute; transform-origin: 50% 100%; will-change: transform; }
+.actor { position: absolute; transform-origin: 50% 100%; }   /* no blanket will-change: ~100 full-size layers per scene
+   ran the graphics memory out (flicker); the engine promotes only big actors that animate continuously */
 .actor .inner, .actor .flipper { position: relative; width: 100%; height: 100%; }
 .actor .flipper.flip { transform: scaleX(-1); }
 .actor svg { display: block; }
@@ -246,8 +247,18 @@ function inlineSVG(name, prefix) {
     .replace(/href="#/g, `href="#${prefix}`);
 }
 
+/* Performance: an inline SVG puts every one of its shapes into the page, and the browser re-layers ALL of them on every
+   frame in which anything animates inside an SVG. So an actor starts as a plain <img> of its SVG (one picture, drawn
+   once) and only becomes inline the first time its parts are needed (part(), parts(), pivot(), .svg) — i.e. only
+   the actors that are actually animated or changed piece by piece. Static scenery stays a picture. */
+const SVG_URLS = {};
+function svgURL(name) {
+  if (!SVG_URLS[name]) SVG_URLS[name] = URL.createObjectURL(new Blob([ASSETS[name]], { type: 'image/svg+xml' }));
+  return SVG_URLS[name];
+}
+
 class Actor {
-  /** name: 'people/worker-walking'; opts: {w,h,flip,cls,before,o,layer} */
+  /** name: 'people/worker-walking'; opts: {w,h,flip,cls,before,o,layer,inline} */
   constructor(layer, name, x, y, opts = {}) {
     this.name = name;
     this.slug = name.split('/').pop();
@@ -256,27 +267,49 @@ class Actor {
     this.st = { dx: 0, dy: 0, s: 1, r: 0 };
     this.loops = {};
 
-    const el = document.createElement('div');
-    el.className = 'actor ' + (opts.cls || '');
-    el.innerHTML = `<div class="inner"><div class="flipper${opts.flip ? ' flip' : ''}">${inlineSVG(name, this.pre)}</div></div>`;
-    const svg = el.querySelector('svg');
-    const vb = svg.getAttribute('viewBox').split(/[\s,]+/).map(Number);
+    const src = ASSETS[name];
+    if (!src) throw new Error('missing asset ' + name);
+    const vb = /viewBox="([^"]+)"/.exec(src)[1].split(/[\s,]+/).map(Number);
     this.vw = vb[2]; this.vh = vb[3];
     this.w = opts.w || this.vw; this.h = opts.h || this.vh;
-    svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%');
-    svg.setAttribute('overflow', 'visible');
-    svg.style.overflow = 'visible';
+
+    const el = document.createElement('div');
+    el.className = 'actor ' + (opts.cls || '');
+    el.innerHTML = `<div class="inner"><div class="flipper${opts.flip ? ' flip' : ''}"></div></div>`;
     Object.assign(el.style, { left: x + 'px', top: y + 'px', width: this.w + 'px', height: this.h + 'px' });
     if (opts.o !== undefined) el.style.opacity = opts.o;
     if (opts.z !== undefined) el.style.zIndex = opts.z;
+    this.el = el; this.inner = el.firstElementChild; this.flipper = this.inner.firstElementChild;
+    this._svg = null; this._img = null;
+    if (opts.inline) this.makeInline();
+    else {
+      const img = document.createElement('img');
+      img.decoding = 'sync'; img.alt = ''; img.draggable = false;
+      img.style.cssText = 'display:block;width:100%;height:100%';
+      img.src = svgURL(name);
+      this.flipper.appendChild(img);
+      this._img = img;
+    }
+    const ref = opts.before && (opts.before.el || opts.before);
+    if (ref && ref.parentNode === layer) layer.insertBefore(el, ref); else layer.appendChild(el);
+  }
+  /** the inline SVG (made on first use) */
+  get svg() { return this._svg || this.makeInline(); }
+  makeInline() {
+    if (this._svg) return this._svg;
+    this.flipper.insertAdjacentHTML('afterbegin', inlineSVG(this.name, this.pre));
+    const svg = this.flipper.querySelector(':scope > svg');
+    svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%');
+    svg.setAttribute('overflow', 'visible');
+    svg.style.overflow = 'visible';
     svg.querySelectorAll('[data-pivot]').forEach(g => {
       const [px, py] = g.getAttribute('data-pivot').split(/[\s,]+/);
       g.style.transformBox = 'view-box';
       g.style.transformOrigin = `${px}px ${py}px`;
     });
-    this.el = el; this.inner = el.firstElementChild; this.flipper = this.inner.firstElementChild; this.svg = svg;
-    const ref = opts.before && (opts.before.el || opts.before);
-    if (ref && ref.parentNode === layer) layer.insertBefore(el, ref); else layer.appendChild(el);
+    if (this._img) { this._img.remove(); this._img = null; }
+    this._svg = svg;
+    return svg;
   }
   part(n) { return this.svg.querySelector('#' + CSS.escape(this.pre + this.slug + '-' + n)); }
   parts(...names) { return names.map(n => this.part(n)).filter(Boolean); }
@@ -305,6 +338,9 @@ class Actor {
   loop(key, target, frames, opts = {}) {
     const el = typeof target === 'string' ? (target === '@inner' ? this.inner : this.part(target)) : target;
     if (!el) { this.stop(key, false); return null; }
+    // a big actor that animates inside itself all the time (rain, clouds, flood water…) gets its own layer, so its
+    // repaints do not spill onto the scenery under it; everything else shares layers (graphics memory stays low)
+    if (el !== this.inner && el !== this.el && this.w * this.h >= W * H * 0.25) this.el.style.willChange = 'transform';
     const { ease: easeOpt, ...o } = opts;
     const ease = easeOpt ?? ((o.duration || 1000) < 250 ? 0 : 400);
     let from = null;
@@ -404,6 +440,21 @@ function puff(layer, x, y, n = 10, color = '#E8DCC8') {
    scene hides its own buttons and progress, reports its state to the page and takes commands from it. */
 const EMBED = new URLSearchParams(location.search).has('embed') && window.parent !== window;
 function embedPost(msg) { if (EMBED) window.parent.postMessage(Object.assign({ cop31: true }, msg), '*'); }
+/* A scene that is not on screen sleeps: the page pauses all its animations (so it costs nothing) and wakes it before
+   showing it again. 'sleep' may come again at any time (e.g. after a rewind made new animations): it re-pauses. */
+let ASLEEP = false;
+const isRewinding = () => typeof rewinding !== 'undefined' && rewinding;   // story.js flag: never freeze a rewind half-way
+const pauseAll = () => document.getAnimations().forEach(a => { if (a.playState === 'running') a.pause(); });
+if (EMBED) {
+  addEventListener('message', e => {
+    const m = e.data || {};
+    if (!m.cop31) return;
+    if (m.cmd === 'sleep') { ASLEEP = true; if (!isRewinding()) pauseAll(); }
+    else if (m.cmd === 'wake') { ASLEEP = false; document.getAnimations().forEach(a => { if (a.playState === 'paused') a.play(); }); }
+  });
+  // animations that start while asleep (a delayed walker, the end of a rewind) are caught and paused too
+  setInterval(() => { if (ASLEEP && !isRewinding()) pauseAll(); }, 400);
+}
 
 /* ==========================================================================
    COP31 — scene 2: flood (wordless, silent; click to advance, click the left side to go back)
@@ -1253,7 +1304,7 @@ function setProgress(ch) {
 function setIndicator() { report(); }
 function showRestart() { END = true; report(); }
 const ended = () => END;
-const report = () => embedPost({ type: 'state', beat, busy, ended: END });
+const report = () => embedPost({ type: 'state', beat, busy, ended: END, rewinding });   // rewinding: the page waits for it to finish before showing this scene
 
 async function advance() {
   if (busy || beat >= BEATS.length - 1) return;
@@ -1284,6 +1335,7 @@ function resetScene() {
 async function rewindTo(target) {
   if (rewinding) return;
   rewinding = true;
+  report();
   const fade = $('#fade');
   const fin = fade.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' });
   await fin.finished.catch(() => {});
@@ -1294,8 +1346,8 @@ async function rewindTo(target) {
   SPEED = 1;
   fade.style.opacity = '0';
   fade.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 });
-  setIndicator(true);
   rewinding = false;
+  setIndicator(true);                                 // reports the end of the rewind to the page
 }
 const back = () => rewindTo(Math.max(-1, beat - 1));
 
@@ -1341,7 +1393,7 @@ async function boot() {
     document.body.classList.add('embed');
     addEventListener('message', async e => {
       const m = e.data || {};
-      if (!m.cop31 || rewinding) return;
+      if (!m.cop31 || rewinding || m.cmd === 'sleep' || m.cmd === 'wake') return;   // sleep / wake: engine.js, no reply (a reply would loop)
       if (m.cmd === 'rewind') await rewindTo(m.to);                       // the state right after beat m.to (−1 = start)
       else if (m.cmd === 'play') { await rewindTo(m.from - 1); advance(); }   // jump to a chapter and play it
       else if (m.cmd === 'key') onKey(m.key);
