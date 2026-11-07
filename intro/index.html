@@ -56,13 +56,13 @@
 
   /* ---- cover (template slide 1) */
   #cover { background: #fff; }
-  /* COP31 | YÖK | ODTÜ: the template's row with the presenting institution added, scaled to 0.785 so it stays clear of
-     the tulip the cover video ends on (each logo in its own proportions) */
-  #cover .cop31 { position: absolute; left: 164px; top: 171px; width: 371px; height: 150px; }
-  #cover .vline { left: 580px; top: 171px; height: 150px; }
-  #cover .yok { position: absolute; left: 625px; top: 175px; width: 288px; height: 143px; }
-  #cover .v2 { left: 958px; }
-  #cover .odtu { left: 1003px; top: 190px; width: 293px; height: 112px; }
+  #cover .cop31 { position: absolute; left: 164px; top: 151px; width: 473px; height: 191px; }
+  #cover .vline { left: 695px; top: 151px; height: 191px; }
+  #cover .yok { position: absolute; left: 748px; top: 156px; width: 366px; height: 182px; }
+  /* the presenting institution: on the cover only, NOT in the template's logo row (user 2026-11-07), top right, clear
+     of the tulip; not on the closing slide */
+  #cover .odtu { right: 64px; top: 56px; width: 220px; height: 84px; }
+  body.outro #cover .odtu { display: none; }
   #cover h1 { position: absolute; left: 164px; top: 470px; width: 1000px; font-size: 92px; font-weight: 700; line-height: 1.04; color: var(--blue); letter-spacing: -.01em; }
   #cover .sub { position: absolute; left: 166px; top: 800px; font-family: 'Outfit', system-ui, sans-serif; font-size: 44px; font-weight: 600; color: var(--green); }
   #cover .notice { width: 1040px; top: 922px; }
@@ -72,12 +72,10 @@
   /* ---- content layout (template slide 3) */
   .content-slide .band { position: absolute; left: 0; top: 0; width: 1920px; height: 152px; }
   .content-slide h2 { position: absolute; left: 72px; top: 0; height: 152px; display: flex; align-items: center; font-size: 52px; font-weight: 700; color: #fff; }
-  .content-slide .notice { width: 1130px; }
-  .content-slide .cop31 { position: absolute; left: 1240px; top: 972px; width: 196px; height: 79px; }
-  .content-slide .vline { left: 1461px; top: 972px; height: 79px; }
-  .content-slide .yok { position: absolute; left: 1485px; top: 951px; width: 162px; height: 80px; }
-  .content-slide .v2 { left: 1672px; }
-  .content-slide .odtu { left: 1696px; top: 975px; width: 188px; height: 72px; }
+  .content-slide .notice { width: 1367px; }
+  .content-slide .cop31 { position: absolute; left: 1476px; top: 972px; width: 196px; height: 79px; }
+  .content-slide .vline { left: 1697px; top: 972px; height: 79px; }
+  .content-slide .yok { position: absolute; left: 1721px; top: 951px; width: 162px; height: 80px; }
   .lead { position: absolute; left: 96px; top: 182px; font-family: 'Outfit', system-ui, sans-serif; font-size: 36px; font-weight: 600; color: var(--blue); }
   .credit { position: absolute; left: 96px; right: 96px; top: 888px; font-size: 18px; color: var(--muted); display: flex; justify-content: space-between; gap: 24px; }
   .credit b { font-weight: 600; color: var(--text); }
@@ -131,7 +129,8 @@
     <video id="v-cover" class="bgv" src="assets/tpl-cover.mp4" muted playsinline preload="auto"></video>
     <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div>
     <i class="vline"></i>
-    <div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div><i class="vline v2"></i><div class="odtu" role="img" aria-label="Middle East Technical University (ODTÜ METU)"></div>
+    <div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
+    <div class="odtu" role="img" aria-label="Middle East Technical University (ODTÜ METU)"></div>
     <h1 class="rise dc">Climate Adaptation Pathways in the Built Environment</h1>
     <div class="sub rise d8">COP31 · Antalya, Türkiye · November 2026</div>
     <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
@@ -155,7 +154,7 @@
       <div class="lab"><span>cooler</span><b>1961–2010 average</b><span>warmer</span></div></div>
     <div class="credit fade d7"><span><b>#ShowYourStripes</b> · Graphics: Prof. Ed Hawkins (University of Reading), CC BY 4.0 · Data: Berkeley Earth</span><span>showyourstripes.info</span></div>
     <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
-    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div><i class="vline v2"></i><div class="odtu" role="img" aria-label="Middle East Technical University (ODTÜ METU)"></div>
+    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
   </section>
 
   <!-- Türkiye -->
@@ -166,7 +165,7 @@
     <div class="axis fade d8" data-from="1850" data-to="2025" data-ticks="1850,1900,1950,2000,2025"></div>
     <div class="credit fade d8"><span><b>#ShowYourStripes</b> · Graphics: Prof. Ed Hawkins (University of Reading), CC BY 4.0 · Data: Berkeley Earth</span><span>showyourstripes.info</span></div>
     <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
-    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div><i class="vline v2"></i><div class="odtu" role="img" aria-label="Middle East Technical University (ODTÜ METU)"></div>
+    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
   </section>
 
   <!-- Antalya -->
@@ -177,7 +176,7 @@
     <div class="axis fade d8" data-from="1857" data-to="2025" data-ticks="1860,1900,1950,2000,2025"></div>
     <div class="credit fade d8"><span><b>#ShowYourStripes</b> · Graphics: Prof. Ed Hawkins (University of Reading), CC BY 4.0 · Data: Berkeley Earth</span><span>showyourstripes.info</span></div>
     <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
-    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div><i class="vline v2"></i><div class="odtu" role="img" aria-label="Middle East Technical University (ODTÜ METU)"></div>
+    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i><div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
   </section>
 </div>
 <script>

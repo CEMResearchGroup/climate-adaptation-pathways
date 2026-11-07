@@ -15,4 +15,4 @@ Bu depo yalnızca derlenmiş siteyi içerir (her sahne tek, kendine yeten bir HT
 
 Warming stripes: #ShowYourStripes, Prof. Ed Hawkins (University of Reading), CC BY 4.0 — https://showyourstripes.info · Veri: Berkeley Earth.
 COP31 logosu: cop31.tr/brand (orijinal oran ve renkleriyle).
-ODTÜ logosu ve amblemi: ODTÜ logo kullanım kılavuzu ve metu.edu.tr (orijinal oran ve renkleriyle).
+ODTÜ logosu (yalnızca kapakta) ve amblemi (sekme simgesi): ODTÜ logo kullanım kılavuzu ve metu.edu.tr (orijinal oran ve renkleriyle).
