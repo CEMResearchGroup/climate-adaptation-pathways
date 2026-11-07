@@ -9,133 +9,184 @@
 <meta property="og:description" content="Two wordless animated scenes on climate adaptation in the built environment: heat stress on a construction site and urban flooding on a city street — today, and with adaptation measures.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0B1020">
+<meta name="theme-color" content="#E9EEF5">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%23FFB300'/%3E%3C/svg%3E">
+<link rel="preload" href="intro/assets/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="intro/assets/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* One presentation: the opening slides (COP31 cover, warming stripes) and the scene sites play back to back, each in its own frame (opened with ?embed: no buttons of
-     their own); the end of one dissolves into the start of the next. A click (or →, Space, PageDown) moves on, the
-     left side of the picture (or ←, PageUp) goes back. This page adds the navigation bar at the bottom: restart, back,
-     the progress line (a station per scene, a bead per section), forward, full screen; it folds away to a small tab.
-     A second full-screen button sits in the top-right corner (visible with the bar folded away, hidden in full screen).
-     In full screen the bar leaves the picture; the mouse at the bottom edge (or N) brings it back. */
-  :root { --accent: #43B97D; --accent-rgb: 67, 185, 125; --panel: rgba(0, 44, 80, .84); --ease: cubic-bezier(.65, 0, .35, 1); }   /* COP31 Türkiye: navy #002C50, mint #43B97D */
-  html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; }
-  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; visibility: hidden; }
-  iframe.on { visibility: visible; }
-  /* overlay on the same 1920×1080 stage the scenes use */
-  #ui { position: fixed; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; pointer-events: none; z-index: 10; }
+  /* One presentation: the opening slides (COP31 cover, warming stripes), the two scenes and the closing THANK YOU play
+     back to back, each in its own frame (opened with ?embed: no buttons of their own); the end of one dissolves into
+     the start of the next. A click (or →, Space, PageDown) moves on, the left side of the picture (or ←, PageUp) goes back.
 
-  /* ---- navigation bar: docked at the bottom centre, folds down out of the picture leaving only its tab */
-  #nav { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); transition: transform .5s var(--ease); pointer-events: auto; }
-  #nav.closed { transform: translate(-50%, calc(100% + 22px)); }
-  #tab { position: absolute; left: 50%; top: -36px; transform: translateX(-50%); width: 96px; height: 36px; border: 0; padding: 0;
-    border-radius: 18px 18px 0 0; background: var(--panel); color: #fff; cursor: pointer; display: grid; place-items: center;
-    opacity: .8; transition: opacity .3s; }
-  #nav.closed #tab { opacity: .45; }
-  #tab:hover, #nav.closed #tab:hover { opacity: 1; }
-  #tab svg { transition: transform .5s var(--ease); }
-  #nav.closed #tab svg { transform: rotate(180deg); }
-  #bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--panel); border-radius: 26px;
-    box-shadow: 0 10px 34px rgba(0, 0, 0, .35); }
-  .nb { width: 58px; height: 58px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; flex: none; color: #fff;
-    background: rgba(255, 255, 255, .09); display: grid; place-items: center; transition: background .25s, opacity .25s, transform .15s; }
-  .nb:hover { background: rgba(255, 255, 255, .2); }
-  .nb:active { transform: scale(.93); }
-  .nb.big { width: 66px; height: 66px; background: rgba(var(--accent-rgb), .2); box-shadow: inset 0 0 0 3px rgba(var(--accent-rgb), .8); }
-  .nb.big:hover { background: rgba(var(--accent-rgb), .36); }
-  .nb:disabled { opacity: .28; cursor: default; background: rgba(255, 255, 255, .06); box-shadow: none; }
-  .sep { width: 2px; height: 40px; border-radius: 1px; background: rgba(255, 255, 255, .16); flex: none; }
+     Layout (YÖK COP31 presentation template): every page is a 16:9 slide in a light outer frame, with the navigation
+     strip under it (restart, back, the progress line — a station per part, a bead per section —, forward, full screen,
+     fold away). The scenes sit on the template's content slide: top band with the title, the animation in a window in
+     the middle, the responsibility notice and the COP31 | YÖK logos at the bottom. In full screen the slide fills the
+     screen and the strip leaves it; the mouse at the bottom edge (or N) brings it back as a small floating bar. */
+  @font-face { font-family: 'Outfit'; font-weight: 400 700; font-display: block; src: url(intro/assets/outfit-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Outfit'; font-weight: 400 700; font-display: block; src: url(intro/assets/outfit-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'Inter Tight'; font-weight: 400 600; font-display: block; src: url(intro/assets/inter-tight-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Inter Tight'; font-weight: 400 600; font-display: block; src: url(intro/assets/inter-tight-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 
-  /* progress line: a station (scene icon) per scene, a bead per section */
-  #line { display: flex; align-items: center; padding: 0 6px; }
-  .st { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none;
-    background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .35); transition: background .4s, box-shadow .4s, transform .4s; }
-  .st svg { width: 32px; height: 32px; display: block; opacity: .55; transition: opacity .4s; }
-  .st.done { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .9); }
+  :root { --blue: #124DA2; --blue-rgb: 18, 77, 162; --green: #44B97E; --green-rgb: 68, 185, 126;   /* the template's colours */
+    --text: #2F3846; --page: #E9EEF5; --ease: cubic-bezier(.65, 0, .35, 1); }
+  html, body { margin: 0; height: 100%; background: var(--page); overflow: hidden; }
+  body { font-family: 'Inter Tight', system-ui, sans-serif; user-select: none; -webkit-font-smoothing: antialiased; }
+  body.full { background: #fff; }
+
+  /* ---- the slide: placed by fit() */
+  #frame { position: fixed; overflow: hidden; background: #fff; border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(16, 40, 80, .10), 0 10px 34px rgba(16, 40, 80, .13); }
+  body.full #frame { border-radius: 0; box-shadow: none; }
+  .slide { position: absolute; inset: 0; visibility: hidden; }
+  .slide.on { visibility: visible; }
+  .slide > iframe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; display: block; }
+  /* a scene slide: the template's content layout around the animation's window (iframe placed by fit()) */
+  .slide.scene > iframe { border-radius: 10px; background: #0B1020;
+    box-shadow: 0 0 0 1px rgba(var(--blue-rgb), .14), 0 8px 26px rgba(0, 30, 70, .16); }
+  .chrome { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; cursor: pointer;
+    color: var(--text); background: #fff url(intro/assets/tpl-swirl.webp) center / cover no-repeat; }
+  .chrome .band { position: absolute; left: 0; top: 0; width: 1920px; height: 152px; background: url(intro/assets/tpl-band.webp) center / 100% 100% no-repeat; }
+  .chrome h2 { position: absolute; left: 72px; top: 0; height: 152px; margin: 0; display: flex; align-items: center;
+    font-family: 'Outfit', system-ui, sans-serif; font-size: 52px; font-weight: 700; color: #fff; }
+  .chrome .notice { position: absolute; left: 84px; top: 945px; width: 1367px; font-size: 16px; line-height: 1.3; }
+  .chrome .notice p { margin: 0; }
+  .chrome .cop31 { position: absolute; left: 1476px; top: 972px; width: 196px; height: 79px; background: url(intro/assets/tpl-cop31-logo.webp) center / contain no-repeat; }
+  .chrome .vline { position: absolute; left: 1697px; top: 972px; width: 3px; height: 79px; background: var(--blue); }
+  .chrome .yok { position: absolute; left: 1721px; top: 951px; width: 162px; height: 80px; background: url(intro/assets/tpl-yok-logo.webp) center / contain no-repeat; }
+
+  /* ---- navigation strip under the slide: plain, in the template's blue and green */
+  #nav { position: fixed; left: 50%; bottom: 0; height: 68px; transform: translateX(-50%); display: flex; align-items: center; z-index: 10; }
+  #bar { display: flex; align-items: center; gap: 8px; padding: 0 10px; height: 52px; border-radius: 26px;
+    transition: background .3s, box-shadow .3s; }
+  .nb { width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; flex: none; color: var(--blue);
+    background: transparent; display: grid; place-items: center; transition: background .2s, opacity .2s, transform .15s; }
+  .nb:hover { background: rgba(var(--blue-rgb), .09); }
+  .nb:active { transform: scale(.92); }
+  .nb.big { width: 42px; height: 42px; box-shadow: inset 0 0 0 2px rgba(var(--blue-rgb), .55); }
+  .nb.big:hover { background: rgba(var(--blue-rgb), .08); box-shadow: inset 0 0 0 2px var(--blue); }
+  .nb:disabled { opacity: .25; cursor: default; background: transparent; }
+  .nb.dim { opacity: .6; } .nb.dim:hover { opacity: 1; }
+  .sep { width: 1px; height: 26px; background: rgba(var(--blue-rgb), .16); flex: none; margin: 0 4px; }
+
+  /* progress line: a station (part icon) per part, a bead per section */
+  #line { display: flex; align-items: center; padding: 0 8px; }
+  .st { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; background: #fff;
+    box-shadow: inset 0 0 0 1.5px rgba(var(--blue-rgb), .28); transition: box-shadow .4s, transform .4s, background .4s; }
+  .st svg { width: 22px; height: 22px; display: block; opacity: .5; transition: opacity .4s; }
+  .st.done { box-shadow: inset 0 0 0 1.5px rgba(var(--blue-rgb), .7); }
   .st.done svg, .st.cur svg { opacity: 1; }
-  .st.cur { background: rgba(var(--accent-rgb), .22); box-shadow: inset 0 0 0 3px var(--accent); transform: scale(1.08); }
-  .bd { width: 16px; height: 16px; border-radius: 50%; flex: none; cursor: pointer; background: rgba(255, 255, 255, .35);
+  .st.cur { background: rgba(var(--green-rgb), .12); box-shadow: inset 0 0 0 2.5px var(--green); transform: scale(1.1); }
+  .bd { width: 9px; height: 9px; border-radius: 50%; flex: none; cursor: pointer; background: rgba(var(--blue-rgb), .2);
     transition: background .4s, transform .4s; }
-  .bd.done { background: rgba(255, 255, 255, .85); }
-  .bd.cur { background: var(--accent); transform: scale(1.35); }
-  .seg { width: 12px; height: 3px; flex: none; background: rgba(255, 255, 255, .28); transition: background .4s; }
-  .seg.long { width: 30px; }
-  .seg.done { background: rgba(255, 255, 255, .8); }
-  .st:hover, .bd:hover { filter: brightness(1.25); }
-  /* full-screen button in the top-right corner: always at hand (also with the bar folded away), gone in full screen */
-  #corner-full { position: absolute; top: 24px; right: 28px; width: 66px; height: 66px; border-radius: 50%; border: 0; padding: 0;
-    background: var(--panel); color: #fff; display: grid; place-items: center; cursor: pointer; pointer-events: auto;
-    opacity: .6; transition: opacity .3s, transform .15s; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); }
-  #corner-full:hover { opacity: 1; }
-  #corner-full:active { transform: scale(.93); }
-  body.full #corner-full { opacity: 0; pointer-events: none; }
-  /* full screen: the bar (tab included) leaves the picture completely; bringing the mouse to the bottom edge brings
-     it back (#hot), moving away hides it again */
-  body.full #nav { transform: translate(-50%, calc(100% + 70px)); }
+  .bd.done { background: rgba(var(--blue-rgb), .75); }
+  .bd.cur { background: var(--green); transform: scale(1.45); }
+  .seg { width: 9px; height: 2px; flex: none; background: rgba(var(--blue-rgb), .15); transition: background .4s; }
+  .seg.long { width: 22px; }
+  .seg.done { background: rgba(var(--blue-rgb), .55); }
+  .st:hover, .bd:hover { filter: brightness(1.15); }
+
+  /* folded away: the strip shrinks to a small tab and the slide grows */
+  #tab-open { display: none; position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 64px; height: 22px; border: 0; padding: 0;
+    border-radius: 11px 11px 0 0; background: rgba(var(--blue-rgb), .1); color: var(--blue); cursor: pointer; place-items: center; z-index: 10;
+    opacity: .7; transition: opacity .2s, background .2s; }
+  #tab-open:hover { opacity: 1; background: rgba(var(--blue-rgb), .16); }
+  body.closed:not(.full) #nav { display: none; }
+  body.closed:not(.full) #tab-open { display: grid; }
+
+  /* full screen: the strip leaves the picture; at the bottom edge (#hot) it comes back as a small floating bar */
+  body.full #nav { bottom: 14px; height: auto; transform: translate(-50%, calc(100% + 30px)); transition: transform .45s var(--ease); }
   body.full.peek #nav { transform: translateX(-50%); }
-  #hot { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; pointer-events: none; }
-  body.full #hot { pointer-events: auto; }
-  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  body.full #bar { background: rgba(255, 255, 255, .96); box-shadow: 0 6px 26px rgba(16, 40, 80, .22); }
+  body.full #b-fold { display: none; }
+  #hot { position: fixed; left: 0; right: 0; bottom: 0; height: 80px; display: none; z-index: 9; }
+  body.full #hot { display: block; }
+  button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 </style>
 </head>
 <body>
-<iframe id="f0" class="on" src="intro/index.html?embed" title="0"></iframe>
-<iframe id="f1" src="scene1-heat/site/index.html?embed" title="1"></iframe>
-<iframe id="f2" src="scene2-flood/site/index.html?embed" title="2"></iframe>
-<div id="ui">
-  <button id="corner-full" aria-label="Tam ekran">
-    <svg viewBox="0 0 24 24" width="30" height="30"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-  <div id="hot" aria-hidden="true"></div>
-  <nav id="nav" aria-label="Climate Adaptation Pathways in the Built Environment">
-    <button id="tab" aria-label="Gezinme çubuğunu aç / kapat" aria-expanded="true">
-      <svg viewBox="0 0 24 24" width="26" height="26"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div id="bar">
-      <button class="nb" id="b-restart" aria-label="Baştan başla">
-        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 12a8 8 0 1 0 2.4-5.7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M4 3v5h5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <i class="sep"></i>
-      <button class="nb big" id="b-prev" aria-label="Geri">
-        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div id="line" aria-hidden="true"></div>
-      <button class="nb big" id="b-next" aria-label="İleri">
-        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M9.5 5.5L16 12l-6.5 6.5" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <i class="sep"></i>
-      <button class="nb" id="b-full" aria-label="Tam ekran">
-        <svg viewBox="0 0 24 24" width="26" height="26"><path id="full-icon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-  </nav>
+<div id="frame">
+  <div class="slide on" id="w0"><iframe id="f0" src="intro/index.html?embed" title="Opening"></iframe></div>
+  <div class="slide scene" id="w1" data-title="Heat stress on a construction site"><iframe id="f1" src="scene1-heat/site/index.html?embed" title="Scene 1: heat stress"></iframe></div>
+  <div class="slide scene" id="w2" data-title="Flooding on a city street"><iframe id="f2" src="scene2-flood/site/index.html?embed" title="Scene 2: urban flooding"></iframe></div>
+  <div class="slide" id="w3"><iframe id="f3" src="intro/index.html?embed&amp;part=outro" title="Thank you"></iframe></div>
 </div>
+<!-- the template's content layout around a scene (filled in for each .slide.scene); the notice must stay identical to
+     intro/build.py's (build.py checks it) -->
+<template id="chrome">
+  <div class="chrome">
+    <div class="band"></div><h2></h2>
+    <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
+    <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i>
+    <div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
+  </div>
+</template>
+<div id="hot" aria-hidden="true"></div>
+<nav id="nav" aria-label="Climate Adaptation Pathways in the Built Environment">
+  <div id="bar">
+    <button class="nb dim" id="b-restart" aria-label="Baştan başla" title="Baştan başla">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 12a8 8 0 1 0 2.4-5.7" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M4 3v5h5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <i class="sep"></i>
+    <button class="nb big" id="b-prev" aria-label="Geri" title="Geri (←)">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div id="line" aria-hidden="true"></div>
+    <button class="nb big" id="b-next" aria-label="İleri" title="İleri (→)">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M9.5 5.5L16 12l-6.5 6.5" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <i class="sep"></i>
+    <button class="nb dim" id="b-full" aria-label="Tam ekran" title="Tam ekran (F)">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path id="full-icon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nb dim" id="b-fold" aria-label="Gezinme çubuğunu gizle" title="Gizle (N)">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</nav>
+<button id="tab-open" aria-label="Gezinme çubuğunu göster" title="Göster (N)">
+  <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 14.5l6-6 6 6" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 <script>
-/* station badges: warming stripes (the opening), the library's sun (scene 1, heat) and heavy rain (scene 2, flood) */
+/* station badges: warming stripes (the opening), the library's sun (scene 1, heat), heavy rain (scene 2, flood),
+   a finish flag (the closing THANK YOU slide) */
 const ICONS = [
   '<svg viewBox="0 0 80 80"><clipPath id="ic-st"><rect x="14" y="18" width="52" height="44" rx="6"/></clipPath><g clip-path="url(#ic-st)"><rect x="14.0" y="18" width="6.6" height="44" fill="#08519c"/><rect x="20.5" y="18" width="6.6" height="44" fill="#4292c6"/><rect x="27.0" y="18" width="6.6" height="44" fill="#9ecae1"/><rect x="33.5" y="18" width="6.6" height="44" fill="#deebf7"/><rect x="40.0" y="18" width="6.6" height="44" fill="#fcbba1"/><rect x="46.5" y="18" width="6.6" height="44" fill="#fb6a4a"/><rect x="53.0" y="18" width="6.6" height="44" fill="#cb181d"/><rect x="59.5" y="18" width="6.6" height="44" fill="#67000d"/></g></svg>',
   '<svg viewBox="0 0 80 80"><g stroke="#FFB300" stroke-width="5" stroke-linecap="round"><line x1="61" y1="40" x2="68" y2="40"/><line x1="54.8" y1="54.8" x2="59.8" y2="59.8"/><line x1="40" y1="61" x2="40" y2="68"/><line x1="25.2" y1="54.8" x2="20.2" y2="59.8"/><line x1="19" y1="40" x2="12" y2="40"/><line x1="25.2" y1="25.2" x2="20.2" y2="20.2"/><line x1="40" y1="19" x2="40" y2="12"/><line x1="54.8" y1="25.2" x2="59.8" y2="20.2"/></g><circle cx="40" cy="40" r="15" fill="#FFB300"/><circle cx="40" cy="40" r="11" fill="#FFC93C"/></svg>',
-  '<svg viewBox="0 0 80 80"><path d="M22 50A12 12 0 0 1 20.4 26.2A17 17 0 0 1 52.6 20.6A13.5 13.5 0 0 1 58.6 50Z" fill="#B5BDCB"/><path d="M18 50H62" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/><g stroke="#4FA3DB" stroke-width="4.5" stroke-linecap="round"><line x1="27" y1="57" x2="23.6" y2="69"/><line x1="40" y1="57" x2="36.6" y2="69"/><line x1="53" y1="57" x2="49.6" y2="69"/><line x1="33.6" y1="70" x2="32.4" y2="74.4"/><line x1="46.6" y1="70" x2="45.4" y2="74.4"/></g></svg>',
+  '<svg viewBox="0 0 80 80"><path d="M22 50A12 12 0 0 1 20.4 26.2A17 17 0 0 1 52.6 20.6A13.5 13.5 0 0 1 58.6 50Z" fill="#9AA6BA"/><path d="M18 50H62" stroke="#6F7C92" stroke-width="3" stroke-linecap="round"/><g stroke="#2F8FD0" stroke-width="4.5" stroke-linecap="round"><line x1="27" y1="57" x2="23.6" y2="69"/><line x1="40" y1="57" x2="36.6" y2="69"/><line x1="53" y1="57" x2="49.6" y2="69"/><line x1="33.6" y1="70" x2="32.4" y2="74.4"/><line x1="46.6" y1="70" x2="45.4" y2="74.4"/></g></svg>',
+  '<svg viewBox="0 0 80 80"><path d="M24 66V14" stroke="#124DA2" stroke-width="5" stroke-linecap="round"/><path d="M26 16h32l-7.5 11 7.5 11H26z" fill="#44B97E"/></svg>',
 ];
 const $ = id => document.getElementById(id);
-const F = [$('f0'), $('f1'), $('f2')];
+const F = [$('f0'), $('f1'), $('f2'), $('f3')];
+const W = F.map(f => f.parentElement);                // the slide around each frame (what is shown, hidden and dissolved)
 const LAST = F.length - 1;
 const S = F.map(() => ({ chapters: [], beats: 0, beat: -1, busy: false, ended: false, rewinding: false }));
 let cur = 0, switching = false;
+
+/* the scene slides get the template's content layout; a click on it (outside the animation) acts like one on the picture */
+document.querySelectorAll('.slide.scene').forEach(w => {
+  const c = $('chrome').content.firstElementChild.cloneNode(true);
+  c.querySelector('h2').textContent = w.dataset.title;
+  c.addEventListener('click', e => { const r = c.getBoundingClientRect(); ((e.clientX - r.left) / r.width < 0.3 ? backward : forward)(); });
+  w.prepend(c);
+});
 
 const send = (i, msg) => {
   if (msg.cmd === 'rewind' || msg.cmd === 'play') { S[i].rewinding = true; asleep[i] = false; }   // until the scene reports back (then it may sleep again)
   F[i].contentWindow.postMessage(Object.assign({ cop31: true }, msg), '*');
 };
 
-/** cross to scene j: prep() puts it in the right state while it is still hidden, then the scene on screen dissolves
-    into it (no black in between, so the scenes read as one continuous piece) */
-let incoming = -1;                                     // the scene being switched to (awake, not yet on screen)
+/** cross to part j: prep() puts it in the right state while it is still hidden, then the slide on screen dissolves
+    into it (no black in between, so the parts read as one continuous piece) */
+let incoming = -1;                                     // the part being switched to (awake, not yet on screen)
 const asleep = F.map(() => false);
 const sleep = i => { if (!asleep[i]) { asleep[i] = true; send(i, { cmd: 'sleep' }); } };
 const wake = i => { asleep[i] = false; send(i, { cmd: 'wake' }); };
-/** resolves once scene j has finished a rewind (it reports rewinding: false), or after `ms` at the latest */
+/** resolves once part j has finished a rewind (it reports rewinding: false), or after `ms` at the latest */
 function ready(j, ms) {
   return new Promise(res => {
     const t0 = performance.now();
@@ -148,9 +199,10 @@ async function switchTo(j, prep) {
   switching = true;
   incoming = j;
   render();
-  const from = F[cur], to = F[j], fromIdx = cur;
+  const from = W[cur], to = W[j], fromIdx = cur;
+  const hadFocus = document.activeElement === F[fromIdx];
   wake(j);
-  // the incoming scene is drawn right away, hidden under the one on screen, so the dissolve never starts on an empty frame
+  // the incoming slide is drawn right away, hidden under the one on screen, so the dissolve never starts on an empty frame
   from.style.zIndex = 2; to.style.zIndex = 1;
   to.classList.add('on');
   if (prep) prep();
@@ -158,6 +210,7 @@ async function switchTo(j, prep) {
   await new Promise(r => setTimeout(r, prep ? 360 : 120)); // its own short fade-in after a rewind is over
   cur = j;
   render();
+  if (hadFocus) F[j].focus();                            // keys keep going to the part on screen
   await from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }).finished;
   from.classList.remove('on');
   from.getAnimations().forEach(a => a.cancel());
@@ -169,13 +222,13 @@ async function switchTo(j, prep) {
 }
 const atStart = i => S[i].beat < 0 && !S[i].busy;
 
-/* forward / back: the scene on screen decides (it hands over to the next / previous scene at its ends) */
+/* forward / back: the part on screen decides (it hands over to the next / previous part at its ends) */
 const forward = () => { if (!switching && !atEnd()) send(cur, { cmd: 'key', key: 'ArrowRight' }); };
 const backward = () => { if (!switching && !atBegin()) send(cur, { cmd: 'key', key: 'ArrowLeft' }); };
 const atBegin = () => cur === 0 && atStart(0);
 const atEnd = () => cur === LAST && S[LAST].ended;   // the presentation stops here: no accidental jump back to the start
 
-/* a station = the scene's opening shot; a bead = one section, played from its start */
+/* a station = the part's opening shot; a bead = one section, played from its start */
 function goStation(j) {
   if (j === cur) { send(j, { cmd: 'rewind', to: -1 }); return; }
   switchTo(j, () => { if (!atStart(j)) send(j, { cmd: 'rewind', to: -1 }); });
@@ -208,7 +261,7 @@ function render() {
       });
     });
   }
-  // state: everything before the current point is done, the current station / section is highlighted (mint)
+  // state: everything before the current point is done, the current station / section is highlighted (green)
   const kids = [...line.children];
   kids.forEach(el => {
     const j = +el.dataset.scene, s = S[j];
@@ -238,7 +291,7 @@ addEventListener('message', e => {
   else if (m.type === 'state') {
     Object.assign(S[i], { beat: m.beat, busy: m.busy, ended: m.ended, rewinding: !!m.rewinding });
     render();
-    if (hidden && !m.rewinding) sleep(i);                // e.g. after ↻ rewound a scene that is not on screen
+    if (hidden && !m.rewinding) sleep(i);                // e.g. after ↻ rewound a part that is not on screen
   }
   else if (m.type === 'next' && i === cur && cur < LAST) {
     switchTo(cur + 1, () => { if (!atStart(cur + 1)) send(cur + 1, { cmd: 'rewind', to: -1 }); });
@@ -248,15 +301,16 @@ addEventListener('message', e => {
   } else if (m.type === 'key' && i === cur) pageKey(m.key);
 });
 
-/* ---- navigation bar */
-const nav = $('nav');
+/* ---- navigation strip */
+const body = document.body;
 function setNav(open) {
-  nav.classList.toggle('closed', !open);
-  $('tab').setAttribute('aria-expanded', String(open));
+  body.classList.toggle('closed', !open);
   try { localStorage.setItem('cop31-nav', open ? 'open' : 'closed'); } catch (err) { /* private mode: not remembered */ }
+  fit();
 }
-try { if (localStorage.getItem('cop31-nav') === 'closed') setNav(false); } catch (err) { /* ignore */ }
-$('tab').addEventListener('click', () => setNav(nav.classList.contains('closed')));
+try { if (localStorage.getItem('cop31-nav') === 'closed') body.classList.add('closed'); } catch (err) { /* ignore */ }
+$('b-fold').addEventListener('click', () => setNav(false));
+$('tab-open').addEventListener('click', () => setNav(true));
 $('b-prev').addEventListener('click', backward);
 $('b-next').addEventListener('click', forward);
 $('b-restart').addEventListener('click', restartAll);
@@ -270,45 +324,45 @@ function toggleFull() {
 }
 function fullIcon() {
   const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
-  document.body.classList.toggle('full', on);
-  clearTimeout(peekTimer); document.body.classList.remove('peek');   // entering or leaving: start with the bar hidden / as set
+  body.classList.toggle('full', on);
+  clearTimeout(peekTimer); body.classList.remove('peek');   // entering or leaving: start with the bar hidden / as set
   $('full-icon').setAttribute('d', on ? 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5' : 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5');
   $('b-full').setAttribute('aria-label', on ? 'Tam ekrandan çık' : 'Tam ekran');
+  fit();
 }
 $('b-full').addEventListener('click', toggleFull);
-$('corner-full').addEventListener('click', toggleFull);
 
 /* full screen: the bar peeks out while the mouse is at the bottom edge or on the bar, and hides 1.2 s after it leaves.
    A click on the bottom edge (outside the bar) still moves the presentation, like a click on the picture. */
 let peekTimer = 0;
 const peek = on => {
   clearTimeout(peekTimer);
-  if (on) document.body.classList.add('peek');
-  else peekTimer = setTimeout(() => document.body.classList.remove('peek'), 1200);
+  if (on) body.classList.add('peek');
+  else peekTimer = setTimeout(() => body.classList.remove('peek'), 1200);
 };
+const nav = $('nav');
 $('hot').addEventListener('mouseenter', () => peek(true));
 $('hot').addEventListener('mouseleave', () => peek(false));
-nav.addEventListener('mouseenter', () => { if (document.body.classList.contains('full')) peek(true); });
-nav.addEventListener('mouseleave', () => { if (document.body.classList.contains('full')) peek(false); });
+nav.addEventListener('mouseenter', () => { if (body.classList.contains('full')) peek(true); });
+nav.addEventListener('mouseleave', () => { if (body.classList.contains('full')) peek(false); });
 $('hot').addEventListener('click', e => {
-  if (e.pointerType === 'touch') { document.body.classList.toggle('peek'); return; }   // touch: no hover, a tap shows it
-  const r = $('ui').getBoundingClientRect();
-  if ((e.clientX - r.left) / r.width < 0.3) backward(); else forward();
+  if (e.pointerType === 'touch') { body.classList.toggle('peek'); return; }   // touch: no hover, a tap shows it
+  if (e.clientX / innerWidth < 0.3) backward(); else forward();
 });
 document.addEventListener('fullscreenchange', fullIcon);
 document.addEventListener('webkitfullscreenchange', fullIcon);
 
-/* keys: F = full screen, N = navigation bar (also when a scene has the focus: it passes them up) */
+/* keys: F = full screen, N = navigation strip (also when a part has the focus: it passes them up) */
 function pageKey(key) {
   if (key === 'f' || key === 'F') { toggleFull(); return true; }
   if (key === 'n' || key === 'N') {
-    if (document.body.classList.contains('full')) { clearTimeout(peekTimer); document.body.classList.toggle('peek'); }
-    else setNav(nav.classList.contains('closed'));
+    if (body.classList.contains('full')) { clearTimeout(peekTimer); body.classList.toggle('peek'); }
+    else setNav(body.classList.contains('closed'));
     return true;
   }
   return false;
 }
-// keys pressed while this page (not a scene) has the focus: page keys here, the rest to the scene on screen
+// keys pressed while this page (not a part) has the focus: page keys here, the rest to the part on screen
 addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (pageKey(e.key)) { e.preventDefault(); return; }
@@ -318,9 +372,21 @@ addEventListener('keydown', e => {
   else if (['1', '2', '3', '4'].includes(k)) { e.preventDefault(); if (!switching) send(cur, { cmd: 'key', key: k }); }
 });
 
+/* the slide (16:9) in the outer frame above the strip; full screen: the whole screen. A scene's animation window sits
+   in the middle of its slide, between the band and the notice, exactly 16:9 so the scene fills it without bars. */
+const WIN = { top: 176, h: 747 };                      // in slide pixels (1920 × 1080): 1328 × 747, centred
 function fit() {
-  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
-  $('ui').style.transform = `translate(${(innerWidth - 1920 * s) / 2}px, ${(innerHeight - 1080 * s) / 2}px) scale(${s})`;
+  const full = body.classList.contains('full'), closed = body.classList.contains('closed');
+  const pad = full ? 0 : 20, strip = full ? 0 : closed ? 26 : 68;
+  const aw = innerWidth - 2 * pad, ah = innerHeight - pad - strip;
+  const s = Math.max(0.05, Math.min(aw / 1920, ah / 1080));
+  const w = Math.round(1920 * s), h = Math.round(1080 * s);
+  Object.assign($('frame').style, { left: Math.round((innerWidth - w) / 2) + 'px', top: Math.round(pad + (ah - h) / 2) + 'px', width: w + 'px', height: h + 'px' });
+  const k = w / 1920;
+  document.querySelectorAll('.chrome').forEach(c => { c.style.transform = `scale(${k})`; });
+  const wh = Math.round(WIN.h * k), ww = Math.round(wh * 16 / 9);
+  document.querySelectorAll('.slide.scene > iframe').forEach(f => Object.assign(f.style, {
+    left: Math.round((w - ww) / 2) + 'px', top: Math.round(WIN.top * k) + 'px', width: ww + 'px', height: wh + 'px' }));
 }
 fit(); addEventListener('resize', fit);
 render();
