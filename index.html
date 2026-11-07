@@ -12,11 +12,11 @@
 <meta name="theme-color" content="#0B1020">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%23FFB300'/%3E%3C/svg%3E">
 <style>
-  /* One presentation: the scene sites play back to back, each in its own frame (opened with ?embed: no buttons of
+  /* One presentation: the opening slides (COP31 cover, warming stripes) and the scene sites play back to back, each in its own frame (opened with ?embed: no buttons of
      their own); the end of one dissolves into the start of the next. A click (or →, Space, PageDown) moves on, the
      left side of the picture (or ←, PageUp) goes back. This page adds the navigation bar at the bottom: restart, back,
      the progress line (a station per scene, a bead per section), forward, full screen; it folds away to a small tab. */
-  :root { --yellow: #F5B70A; --panel: rgba(17, 25, 48, .74); --ease: cubic-bezier(.65, 0, .35, 1); }
+  :root { --accent: #43B97D; --accent-rgb: 67, 185, 125; --panel: rgba(0, 44, 80, .84); --ease: cubic-bezier(.65, 0, .35, 1); }   /* COP31 Türkiye: navy #002C50, mint #43B97D */
   html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; }
   iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; visibility: hidden; }
@@ -40,8 +40,8 @@
     background: rgba(255, 255, 255, .09); display: grid; place-items: center; transition: background .25s, opacity .25s, transform .15s; }
   .nb:hover { background: rgba(255, 255, 255, .2); }
   .nb:active { transform: scale(.93); }
-  .nb.big { width: 66px; height: 66px; background: rgba(245, 183, 10, .2); box-shadow: inset 0 0 0 3px rgba(245, 183, 10, .75); }
-  .nb.big:hover { background: rgba(245, 183, 10, .34); }
+  .nb.big { width: 66px; height: 66px; background: rgba(var(--accent-rgb), .2); box-shadow: inset 0 0 0 3px rgba(var(--accent-rgb), .8); }
+  .nb.big:hover { background: rgba(var(--accent-rgb), .36); }
   .nb:disabled { opacity: .28; cursor: default; background: rgba(255, 255, 255, .06); box-shadow: none; }
   .sep { width: 2px; height: 40px; border-radius: 1px; background: rgba(255, 255, 255, .16); flex: none; }
 
@@ -52,21 +52,22 @@
   .st svg { width: 32px; height: 32px; display: block; opacity: .55; transition: opacity .4s; }
   .st.done { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .9); }
   .st.done svg, .st.cur svg { opacity: 1; }
-  .st.cur { background: rgba(245, 183, 10, .22); box-shadow: inset 0 0 0 3px var(--yellow); transform: scale(1.08); }
+  .st.cur { background: rgba(var(--accent-rgb), .22); box-shadow: inset 0 0 0 3px var(--accent); transform: scale(1.08); }
   .bd { width: 16px; height: 16px; border-radius: 50%; flex: none; cursor: pointer; background: rgba(255, 255, 255, .35);
     transition: background .4s, transform .4s; }
   .bd.done { background: rgba(255, 255, 255, .85); }
-  .bd.cur { background: var(--yellow); transform: scale(1.35); }
+  .bd.cur { background: var(--accent); transform: scale(1.35); }
   .seg { width: 12px; height: 3px; flex: none; background: rgba(255, 255, 255, .28); transition: background .4s; }
   .seg.long { width: 30px; }
   .seg.done { background: rgba(255, 255, 255, .8); }
   .st:hover, .bd:hover { filter: brightness(1.25); }
-  button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 </style>
 </head>
 <body>
-<iframe id="f0" class="on" src="scene1-heat/site/index.html?embed" title="1"></iframe>
-<iframe id="f1" src="scene2-flood/site/index.html?embed" title="2"></iframe>
+<iframe id="f0" class="on" src="intro/index.html?embed" title="0"></iframe>
+<iframe id="f1" src="scene1-heat/site/index.html?embed" title="1"></iframe>
+<iframe id="f2" src="scene2-flood/site/index.html?embed" title="2"></iframe>
 <div id="ui">
   <nav id="nav" aria-label="Climate Adaptation Pathways in the Built Environment">
     <button id="tab" aria-label="Gezinme çubuğunu aç / kapat" aria-expanded="true">
@@ -92,13 +93,14 @@
   </nav>
 </div>
 <script>
-/* station badges: the library's sun (scene 1, heat) and heavy rain (scene 2, flood) icons */
+/* station badges: warming stripes (the opening), the library's sun (scene 1, heat) and heavy rain (scene 2, flood) */
 const ICONS = [
+  '<svg viewBox="0 0 80 80"><clipPath id="ic-st"><rect x="14" y="18" width="52" height="44" rx="6"/></clipPath><g clip-path="url(#ic-st)"><rect x="14.0" y="18" width="6.6" height="44" fill="#08519c"/><rect x="20.5" y="18" width="6.6" height="44" fill="#4292c6"/><rect x="27.0" y="18" width="6.6" height="44" fill="#9ecae1"/><rect x="33.5" y="18" width="6.6" height="44" fill="#deebf7"/><rect x="40.0" y="18" width="6.6" height="44" fill="#fcbba1"/><rect x="46.5" y="18" width="6.6" height="44" fill="#fb6a4a"/><rect x="53.0" y="18" width="6.6" height="44" fill="#cb181d"/><rect x="59.5" y="18" width="6.6" height="44" fill="#67000d"/></g></svg>',
   '<svg viewBox="0 0 80 80"><g stroke="#FFB300" stroke-width="5" stroke-linecap="round"><line x1="61" y1="40" x2="68" y2="40"/><line x1="54.8" y1="54.8" x2="59.8" y2="59.8"/><line x1="40" y1="61" x2="40" y2="68"/><line x1="25.2" y1="54.8" x2="20.2" y2="59.8"/><line x1="19" y1="40" x2="12" y2="40"/><line x1="25.2" y1="25.2" x2="20.2" y2="20.2"/><line x1="40" y1="19" x2="40" y2="12"/><line x1="54.8" y1="25.2" x2="59.8" y2="20.2"/></g><circle cx="40" cy="40" r="15" fill="#FFB300"/><circle cx="40" cy="40" r="11" fill="#FFC93C"/></svg>',
   '<svg viewBox="0 0 80 80"><path d="M22 50A12 12 0 0 1 20.4 26.2A17 17 0 0 1 52.6 20.6A13.5 13.5 0 0 1 58.6 50Z" fill="#B5BDCB"/><path d="M18 50H62" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/><g stroke="#4FA3DB" stroke-width="4.5" stroke-linecap="round"><line x1="27" y1="57" x2="23.6" y2="69"/><line x1="40" y1="57" x2="36.6" y2="69"/><line x1="53" y1="57" x2="49.6" y2="69"/><line x1="33.6" y1="70" x2="32.4" y2="74.4"/><line x1="46.6" y1="70" x2="45.4" y2="74.4"/></g></svg>',
 ];
 const $ = id => document.getElementById(id);
-const F = [$('f0'), $('f1')];
+const F = [$('f0'), $('f1'), $('f2')];
 const LAST = F.length - 1;
 const S = F.map(() => ({ chapters: [], beats: 0, beat: -1, busy: false, ended: false }));
 let cur = 0, switching = false;
@@ -166,7 +168,7 @@ function render() {
       });
     });
   }
-  // state: everything before the current point is done, the current station / section is yellow
+  // state: everything before the current point is done, the current station / section is highlighted (mint)
   const kids = [...line.children];
   kids.forEach(el => {
     const j = +el.dataset.scene, s = S[j];
