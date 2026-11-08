@@ -269,7 +269,12 @@ if (EMBED) {
       sleptVideos = [vCover, vContent].filter(v => !v.paused && !v.ended);
       sleptVideos.forEach(v => v.pause());
     } else if (m.cmd === 'wake') {
-      if (OUTRO) { show(-1, true); return; }
+      if (OUTRO) {
+        document.getAnimations().forEach(a => { if (a.playState === 'paused') { try { a.finish(); } catch (e) { a.play(); } } });
+        sleptVideos = [];
+        show(-1, true);
+        return;
+      }
       document.getAnimations().forEach(a => { if (a.playState === 'paused') a.play(); });
       sleptVideos.forEach(v => { const p = v.play(); if (p) p.catch(() => {}); });
       sleptVideos = [];
