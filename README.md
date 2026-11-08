@@ -1,10 +1,11 @@
 # Climate Adaptation Pathways in the Built Environment
 
-İklim uyumu üzerine bir sunum (COP31 paneli için, YÖK COP31 sunum şablonuyla): COP31 kapağı, panelistler, warming stripes (Türkiye ve Antalya), üç yazısız animasyon sahnesi ve kapanış (THANK YOU):
+İklim uyumu üzerine bir sunum (COP31 paneli için, YÖK COP31 sunum şablonuyla): COP31 kapağı, panelistler, warming stripes (Türkiye ve Antalya), dört animasyon sahnesi ve kapanış (THANK YOU):
 
 1. **Sahne 1 – Sıcak hava stresi** (şantiye: bugünkü durum ve önlemler)
 2. **Sahne 2 – Kentsel sel** (bugünkü sokak ve aynı sokak önlemlerle: drenaj, geçirimli yüzeyler, yeşil alan, depolama, sensörler)
 3. **Sahne 3 – Şantiyeden önceki kararlar** (tasarım ofisi: üç tasarım alternatifi, bugün ve 2050 yan yana; sonunda iki dönemde karşılaştırma)
+4. **Sahne 4: 2050'de bir mahalle** (aynı sokak bugün, hiçbir şey değişmezse 2050 ve ortak bir gelecekle 2050; sokak, binalar ve yeraltı etiketleri; sonunda üçü yan yana)
 
 **Canlı sunum:** https://cemresearchgroup.github.io/climate-adaptation-pathways/
 
