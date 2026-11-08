@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Climate Adaptation Pathways in the Built Environment: Summary</title>
+<style>
+  @font-face { font-family: 'Outfit'; font-weight: 400 700; font-display: block; src: url(../intro/assets/outfit-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Outfit'; font-weight: 400 700; font-display: block; src: url(../intro/assets/outfit-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  @font-face { font-family: 'Inter Tight'; font-weight: 400 600; font-display: block; src: url(../intro/assets/inter-tight-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: 'Inter Tight'; font-weight: 400 600; font-display: block; src: url(../intro/assets/inter-tight-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+  :root { --blue: #124DA2; --blue-rgb: 18, 77, 162; --green: #44B97E; --text: #2F3846; --ease: cubic-bezier(.65, 0, .35, 1); }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #fff; }
+  body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--text); user-select: none; cursor: pointer; -webkit-font-smoothing: antialiased; }
+  body.embed { cursor: default; }
+  @media (pointer: coarse) { body.embed #stage { cursor: pointer; } }
+  #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden;
+    background: #fff url(../intro/assets/tpl-swirl.webp) center / cover no-repeat; }
+
+  .band { position: absolute; left: 0; top: 0; width: 1920px; height: 92px; background: url(../intro/assets/tpl-band.webp) center / 100% 100% no-repeat; }
+  h2 { position: absolute; left: 60px; top: 0; height: 92px; margin: 0; display: flex; align-items: center;
+    font-family: 'Outfit', system-ui, sans-serif; font-size: 42px; font-weight: 700; color: #fff; }
+  .notice { position: absolute; left: 84px; top: 1014px; width: 1436px; font-size: 12.5px; line-height: 1.3; }
+  .notice p { margin: 0; }
+  .cop31 { position: absolute; left: 1550px; top: 1012px; width: 150px; height: 60px; background: url(../intro/assets/tpl-cop31-logo.webp) center / contain no-repeat; }
+  .vline { position: absolute; left: 1715px; top: 1012px; width: 3px; height: 60px; background: var(--blue); }
+  .yok { position: absolute; left: 1733px; top: 1012px; width: 122px; height: 60px; background: url(../intro/assets/tpl-yok-logo.webp) center / contain no-repeat; }
+
+  .lab { position: absolute; height: 34px; display: flex; align-items: center; gap: 12px; white-space: nowrap;
+    font-family: 'Outfit', system-ui, sans-serif; font-size: 25px; font-weight: 600; color: var(--blue); }
+  .lab b { width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--blue); color: #fff; font-size: 19px; font-weight: 700; }
+  .tile { position: absolute; overflow: hidden; border-radius: 10px; background: #0B1020;
+    box-shadow: 0 0 0 1px rgba(var(--blue-rgb), .14), 0 8px 26px rgba(0, 30, 70, .16); }
+  .tile img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+  .tile iframe { position: absolute; left: 0; top: 0; border: 0; display: block; opacity: 0; pointer-events: none; }
+
+  .play .lab, .play .tile { animation: rise .8s var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="band"></div><h2>Summary: How each scene ends</h2>
+
+  <div class="lab" style="left:60px;top:106px"><b>1</b>Heat stress on a construction site</div>
+  <div class="tile" id="t1" style="left:60px;top:146px;width:584px;height:328px"><img src="assets/poster-1.webp" alt="Scene 1, end: the construction site by day and by night"></div>
+  <div class="lab" style="left:668px;top:106px"><b>2</b>Flooding on a city street</div>
+  <div class="tile" id="t2" style="left:668px;top:146px;width:584px;height:328px"><img src="assets/poster-2.webp" alt="Scene 2, end: the flooded street and the street that drains"></div>
+  <div class="lab" style="left:1276px;top:106px"><b>3</b>Decisions before the site</div>
+  <div class="tile" id="t3" style="left:1276px;top:146px;width:584px;height:328px"><img src="assets/poster-3.webp" alt="Scene 3, end: the three design alternatives compared, today and in 2050"></div>
+
+  <div class="lab" style="left:60px;top:496px"><b>4</b>A neighbourhood in 2050: Which future?</div>
+  <div class="tile" id="t4" style="left:60px;top:536px;width:1800px;height:464px"><img src="assets/poster-4.webp" alt="Scene 4, end: the same street in 2026, in 2050 if nothing changes, and in 2050 as a shared future"></div>
+
+  <div class="notice"><p>Bu sunumda yer alan görüş, bilgi ve ifadelerden, sunumun hazırlanmasından ve içeriğinden yalnızca ODTÜ sorumlu olup, sunum Yükseköğretim Kurulu’nun (YÖK) görüşlerini yansıtmaz ve Kurula herhangi bir sorumluluk yüklemez.</p><p>ODTÜ is solely responsible for the views, information and statements expressed in this presentation, as well as for its preparation and content. The presentation does not necessarily reflect the views of the Council of Higher Education of Türkiye (YÖK), nor does it imply any responsibility or liability on its part.</p></div>
+  <div class="cop31" role="img" aria-label="COP31 Türkiye Antalya"></div><i class="vline"></i>
+  <div class="yok" role="img" aria-label="Council of Higher Education (YÖK)"></div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const $stage = $('#stage');
+const EMBED = new URLSearchParams(location.search).has('embed') && window.parent !== window;
+const post = msg => { if (EMBED) window.parent.postMessage(Object.assign({ cop31: true }, msg), '*'); };
+const LIGHT = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
+
+const TILES = [
+  { el: $('#t1'), src: '../scene1-heat/site/index.html?embed' },
+  { el: $('#t2'), src: '../scene2-flood/site/index.html?embed' },
+  { el: $('#t3'), src: '../scene3-design/site/index.html?embed' },
+  { el: $('#t4'), src: '../scene4-future/site/index.html?embed', crop: { y: 312, h: 495 } },
+];
+TILES.forEach(t => {
+  t.ifr = document.createElement('iframe');
+  t.ifr.tabIndex = -1;
+  t.ifr.setAttribute('aria-hidden', 'true');
+  const w = t.el.offsetWidth, h = t.el.offsetHeight;
+  if (t.crop) {
+    const k = h / t.crop.h;
+    Object.assign(t.ifr.style, { width: Math.round(1920 * k) + 'px', height: Math.round(1080 * k) + 'px',
+      left: Math.round((w - 1920 * k) / 2) + 'px', top: -Math.round(t.crop.y * k) + 'px' });
+  } else Object.assign(t.ifr.style, { width: w + 'px', height: h + 'px' });
+  t.el.appendChild(t.ifr);
+  t.phase = 'idle';
+});
+
+const show = (t, on, delay = 0) => {
+  t.fade?.cancel?.();
+  const from = getComputedStyle(t.ifr).opacity;
+  t.fade = t.ifr.animate([{ opacity: from }, { opacity: on ? 1 : 0 }], { duration: on ? 800 : 700, delay, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' });
+  return t.fade.finished.catch(() => {});
+};
+const tell = (t, msg) => t.ifr.contentWindow.postMessage(Object.assign({ cop31: true }, msg), '*');
+addEventListener('message', e => {
+  const t = TILES.find(x => x.ifr.contentWindow === e.source);
+  const m = e.data || {};
+  if (!t || !m.cop31 || t.phase === 'idle') return;
+  if (m.type === 'meta' && t.phase === 'load') {
+    t.beats = m.beats;
+    t.phase = 'end';
+    tell(t, { cmd: 'rewind', to: t.beats - 1 });
+  } else if (m.type === 'state' && t.phase === 'end' && !m.rewinding && !m.busy && m.beat === t.beats - 1) {
+    t.phase = 'live';
+    show(t, true, 450);
+  }
+});
+function start() {
+  if (LIGHT) return;
+  TILES.forEach(t => {
+    if (t.phase !== 'idle') return;
+    t.phase = 'load';
+    t.ifr.src = t.src;
+  });
+}
+function stop() {
+  TILES.forEach(t => {
+    if (t.phase === 'idle') return;
+    t.phase = 'idle';
+    t.fade?.cancel?.();
+    t.ifr.style.opacity = '0';
+    t.ifr.src = 'about:blank';
+  });
+}
+
+const report = () => post({ type: 'state', beat: -1, busy: false, ended: true, rewinding: false });
+const fwd = () => post({ type: 'next' });
+const bwd = () => post({ type: 'prev' });
+function onKey(key) {
+  if (['ArrowLeft', 'Backspace', 'PageUp'].includes(key)) { bwd(); return true; }
+  if ([' ', 'Enter', 'ArrowRight', 'PageDown'].includes(key)) { fwd(); return true; }
+  return false;
+}
+addEventListener('keydown', e => {
+  if (onKey(e.key)) e.preventDefault();
+  else if (!e.ctrlKey && !e.metaKey && !e.altKey) post({ type: 'key', key: e.key });
+});
+$stage.addEventListener('click', e => {
+  const r = $stage.getBoundingClientRect();
+  if ((e.clientX - r.left) / r.width < 0.3) bwd(); else fwd();
+});
+function entrance() { $stage.classList.remove('play'); void $stage.offsetWidth; $stage.classList.add('play'); }
+
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $stage.style.transform = `translate(${(innerWidth - 1920 * s) / 2}px, ${(innerHeight - 1080 * s) / 2}px) scale(${s})`;
+}
+fit(); addEventListener('resize', fit);
+
+if (EMBED) {
+  document.body.classList.add('embed');
+  addEventListener('message', e => {
+    const m = e.data || {};
+    if (!m.cop31 || e.source !== window.parent) return;
+    if (m.cmd === 'wake') { entrance(); start(); }
+    else if (m.cmd === 'sleep') stop();
+    else if (m.cmd === 'key') onKey(m.key);
+    if (m.cmd === 'rewind' || m.cmd === 'play') report();
+  });
+  post({ type: 'meta', chapters: [], beats: 0 });
+  report();
+} else { entrance(); start(); }
+</script>
+</body>
+</html>
