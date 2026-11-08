@@ -119,11 +119,6 @@ body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--ink); -we
 
 .tint { opacity: 0; pointer-events: none;
   background: radial-gradient(75% 65% at 50% 40%, rgba(95, 227, 255, .12), rgba(95, 227, 255, 0) 70%), linear-gradient(180deg, rgba(18, 60, 130, .16), rgba(10, 30, 80, .1)); }
-.sensor { display: flex; align-items: center; gap: 12px; padding: 0 14px 0 12px; white-space: nowrap; border-radius: 10px;
-  background: #0E1730; color: #CFE9F5; font: 500 13px/1 'Inter Tight', system-ui, sans-serif;
-  box-shadow: 0 0 0 1.5px rgba(95, 227, 255, .7), 0 4px 12px rgba(8, 16, 40, .3); }
-.sensor b { color: #fff; font-weight: 700; font-size: 16px; margin-right: 3px; }
-.sensor i { width: 9px; height: 9px; border-radius: 50%; background: #3DDC84; box-shadow: 0 0 6px #3DDC84; }
 .slim { border-radius: 7px; background: #0E1730; padding: 5px; box-shadow: 0 6px 14px rgba(8, 16, 40, .3); transition: box-shadow .5s; }
 .slim::before { content: ''; position: absolute; left: 50%; top: 100%; width: 14px; height: 34px; transform: translateX(-50%);
   background: linear-gradient(90deg, #8E9AB0, #CDD5E3 50%, #8794AB); }
@@ -152,10 +147,6 @@ body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--ink); -we
 .wrisk span.r { display: flex; align-items: center; gap: 5px; font: 600 12px 'Inter Tight', system-ui, sans-serif; color: var(--muted); }
 .wrisk img { width: 28px; height: 28px; }
 
-.artag { display: flex; align-items: center; gap: 7px; padding: 0 11px 0 9px; white-space: nowrap; border-radius: 15px;
-  background: rgba(240, 252, 255, .72); color: #0B5A78; font: 600 13px/30px 'Inter Tight', system-ui, sans-serif;
-  box-shadow: 0 0 0 1.5px rgba(25, 180, 214, .8), 0 0 14px rgba(95, 227, 255, .45); }
-.artag i { width: 8px; height: 8px; border-radius: 50%; background: #19B4D6; box-shadow: 0 0 6px #5FE3FF; }
 .arcard { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px;
   background: rgba(240, 252, 255, .66); box-shadow: 0 0 0 1.5px rgba(25, 180, 214, .85), 0 0 16px rgba(95, 227, 255, .5); }
 .arcard img { width: 30px; height: 30px; flex: none; }
@@ -656,9 +647,6 @@ function furnishHalf(r, future) {
     new Actor(r.table, 'props/table-led-half', 0, 730);
     new Actor(r.table, 'props/tablet-flat', ...SPOT.tablet);
     new Actor(r.table, 'props/vr-headset', ...SPOT.vr);
-    const sensor = at(r.boardL, 'sensor', 708, 118, 0, 46, '<i></i><span><b>22 °C</b> indoor</span><span><b>420</b> ppm CO₂</span>');
-    sensor.style.opacity = 1;
-    at(r.ui, 'artag', 14, 112, 0, 30, '<i></i>Solar glass · 1.4 kW').style.opacity = 1;
   }
   r.P = { presenter: cast(r.back, 'presenter'), woman: cast(r.front, 'woman'), engineer: cast(r.front, 'engineer'), man: cast(r.front, 'man'), typist: cast(r.front, 'typist') };
   if (future) Object.values(r.P).forEach(c => {
