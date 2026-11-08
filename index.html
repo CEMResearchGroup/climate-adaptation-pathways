@@ -76,6 +76,8 @@
   .seg.long { width: 22px; }
   .seg.done { background: rgba(var(--blue-rgb), .55); }
   .st:hover, .bd:hover { filter: brightness(1.15); }
+  @media (max-width: 760px) { #line .bd, #line .seg:not(.long) { display: none; } }
+  @media (max-width: 560px) { #line, .sep { display: none; } #bar { gap: 14px; } }
 
   #tab-open { display: none; position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 64px; height: 22px; border: 0; padding: 0;
     border-radius: 11px 11px 0 0; background: rgba(var(--blue-rgb), .1); color: var(--blue); cursor: pointer; place-items: center; z-index: 10;
@@ -95,12 +97,12 @@
 </head>
 <body>
 <div id="frame">
-  <div class="slide on" id="w0"><iframe id="f0" src="intro/index.html?embed" title="Opening"></iframe></div>
-  <div class="slide scene" id="w1" data-title="Heat stress on a construction site"><iframe id="f1" src="scene1-heat/site/index.html?embed" title="Scene 1: heat stress"></iframe></div>
-  <div class="slide scene" id="w2" data-title="Flooding on a city street"><iframe id="f2" src="scene2-flood/site/index.html?embed" title="Scene 2: urban flooding"></iframe></div>
-  <div class="slide scene" id="w3" data-title="Decisions before the site"><iframe id="f3" src="scene3-design/site/index.html?embed" title="Scene 3: design decisions"></iframe></div>
-  <div class="slide scene" id="w4" data-title="A neighbourhood in 2050"><iframe id="f4" src="scene4-future/site/index.html?embed" title="Scene 4: a neighbourhood in 2050"></iframe></div>
-  <div class="slide" id="w5"><iframe id="f5" src="intro/index.html?embed&amp;part=outro" title="Thank you"></iframe></div>
+  <div class="slide on" id="w0"><iframe id="f0" data-src="intro/index.html?embed" title="Opening"></iframe></div>
+  <div class="slide scene" id="w1" data-title="Heat stress on a construction site"><iframe id="f1" data-src="scene1-heat/site/index.html?embed" title="Scene 1: heat stress"></iframe></div>
+  <div class="slide scene" id="w2" data-title="Flooding on a city street"><iframe id="f2" data-src="scene2-flood/site/index.html?embed" title="Scene 2: urban flooding"></iframe></div>
+  <div class="slide scene" id="w3" data-title="Decisions before the site"><iframe id="f3" data-src="scene3-design/site/index.html?embed" title="Scene 3: design decisions"></iframe></div>
+  <div class="slide scene" id="w4" data-title="A neighbourhood in 2050"><iframe id="f4" data-src="scene4-future/site/index.html?embed" title="Scene 4: a neighbourhood in 2050"></iframe></div>
+  <div class="slide" id="w5"><iframe id="f5" data-src="intro/index.html?embed&amp;part=outro" title="Thank you"></iframe></div>
 </div>
 <template id="chrome">
   <div class="chrome">
@@ -166,6 +168,26 @@ const send = (i, msg) => {
 
 let incoming = -1;
 const asleep = F.map(() => false);
+const LIGHT = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
+const loaded = F.map(() => false);
+const arrived = F.map(() => null);
+function load(i) {
+  if (loaded[i]) return Promise.resolve();
+  loaded[i] = true;
+  asleep[i] = false;
+  Object.assign(S[i], { beat: -1, busy: false, ended: false, rewinding: false });
+  return new Promise(res => {
+    arrived[i] = res;
+    setTimeout(res, 12000);
+    F[i].src = F[i].dataset.src;
+  });
+}
+function unload(i) {
+  if (!LIGHT || !loaded[i] || i === cur || i === incoming) return;
+  loaded[i] = false;
+  F[i].src = 'about:blank';
+  Object.assign(S[i], { beat: -1, busy: false, ended: i === LAST, rewinding: false });
+}
 const sleep = i => { if (!asleep[i]) { asleep[i] = true; send(i, { cmd: 'sleep' }); } };
 const wake = i => { asleep[i] = false; send(i, { cmd: 'wake' }); };
 function ready(j, ms) {
@@ -180,6 +202,7 @@ async function switchTo(j, prep) {
   switching = true;
   incoming = j;
   render();
+  await load(j);
   const from = W[cur], to = W[j], fromIdx = cur;
   const hadFocus = document.activeElement === F[fromIdx];
   wake(j);
@@ -198,6 +221,7 @@ async function switchTo(j, prep) {
   sleep(fromIdx);
   incoming = -1;
   switching = false;
+  unload(fromIdx);
   render();
 }
 const atStart = i => S[i].beat < 0 && !S[i].busy;
@@ -263,7 +287,10 @@ addEventListener('message', e => {
   const m = e.data || {};
   if (i < 0 || !m.cop31) return;
   const hidden = i !== cur && i !== incoming;
-  if (m.type === 'meta') { S[i].chapters = m.chapters; S[i].beats = m.beats; $('line').innerHTML = ''; render(); if (hidden) sleep(i); }
+  if (m.type === 'meta') {
+    S[i].chapters = m.chapters; S[i].beats = m.beats; $('line').innerHTML = ''; render(); if (hidden) sleep(i);
+    if (arrived[i]) { arrived[i](); arrived[i] = null; }
+  }
   else if (m.type === 'state') {
     Object.assign(S[i], { beat: m.beat, busy: m.busy, ended: m.ended, rewinding: !!m.rewinding });
     render();
@@ -290,7 +317,10 @@ $('b-prev').addEventListener('click', backward);
 $('b-next').addEventListener('click', forward);
 $('b-restart').addEventListener('click', restartAll);
 
+const CAN_FULL = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+if (!CAN_FULL) $('b-full').style.display = 'none';
 function toggleFull() {
+  if (!CAN_FULL) return;
   const d = document, el = d.documentElement;
   const r = (d.fullscreenElement || d.webkitFullscreenElement)
     ? (d.exitFullscreen || d.webkitExitFullscreen).call(d)
@@ -360,6 +390,7 @@ function fit() {
 fit(); addEventListener('resize', fit);
 render();
 F[0].addEventListener('load', () => F[0].focus());
+F.forEach((f, i) => { if (!LIGHT || i === 0) load(i); });
 </script>
 </body>
 </html>
