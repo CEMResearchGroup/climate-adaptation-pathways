@@ -14,8 +14,8 @@
   --green: #2FBF71;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
-body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; -webkit-font-smoothing: antialiased; user-select: none; }
+html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 #viewport { position: fixed; inset: 0; }
 #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #fff; cursor: pointer; }
 #shake, #world { position: absolute; inset: 0; width: 1920px; height: 1080px; }
@@ -457,6 +457,14 @@ if (EMBED) {
   });
   setInterval(() => { if (ASLEEP && !isRewinding()) pauseAll(); }, 400);
 }
+let touchFrom = null;
+addEventListener('touchstart', e => { touchFrom = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+addEventListener('touchend', e => {
+  if (!touchFrom || e.touches.length) return;
+  const dx = e.changedTouches[0].clientX - touchFrom.x, dy = e.changedTouches[0].clientY - touchFrom.y;
+  touchFrom = null;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) dispatchEvent(new KeyboardEvent('keydown', { key: dx < 0 ? 'ArrowRight' : 'ArrowLeft' }));
+}, { passive: true });
 
 const AUTO = {
   printer: { x: 1300, y: 390, zTravel: -218, carriage: 160 },

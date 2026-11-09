@@ -19,8 +19,8 @@
     --text: #2F3846; --muted: #5B6577;
     --ease: cubic-bezier(.65, 0, .35, 1);
   }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #fff; }
-  body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--text); user-select: none; cursor: pointer;
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #fff; touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--text); user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: pointer;
     -webkit-font-smoothing: antialiased; }
   #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #fff; }
   .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .7s var(--ease), visibility 0s .7s; }
@@ -244,6 +244,14 @@ addEventListener('keydown', e => {
   if (onKey(e.key)) e.preventDefault();
   else if (!e.ctrlKey && !e.metaKey && !e.altKey) post({ type: 'key', key: e.key });
 });
+let touchFrom = null;
+addEventListener('touchstart', e => { touchFrom = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+addEventListener('touchend', e => {
+  if (!touchFrom || e.touches.length) return;
+  const dx = e.changedTouches[0].clientX - touchFrom.x, dy = e.changedTouches[0].clientY - touchFrom.y;
+  touchFrom = null;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) dispatchEvent(new KeyboardEvent('keydown', { key: dx < 0 ? 'ArrowRight' : 'ArrowLeft' }));
+}, { passive: true });
 $stage.addEventListener('click', e => {
   const r = $stage.getBoundingClientRect();
   if ((e.clientX - r.left) / r.width < 0.3) bwd(); else fwd();

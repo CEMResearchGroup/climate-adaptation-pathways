@@ -14,8 +14,8 @@
   --ink: #23324F; --muted: #5A6578; --navy: #1E2F55; --orange: #F26B1D; --green: #2E9E5B; --red: #D9483B;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; }
-body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; user-select: none; }
+html, body { margin: 0; height: 100%; background: #0B1020; overflow: hidden; touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter Tight', system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 #viewport { position: fixed; inset: 0; }
 #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #E9DCC4; cursor: pointer; }
 #backdrop { position: absolute; inset: 0; opacity: 0; background: linear-gradient(180deg, #EEF2F8 0%, #E3E9F2 100%); }
@@ -425,6 +425,14 @@ if (EMBED) {
   });
   setInterval(() => { if (ASLEEP && !isRewinding()) pauseAll(); }, 400);
 }
+let touchFrom = null;
+addEventListener('touchstart', e => { touchFrom = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+addEventListener('touchend', e => {
+  if (!touchFrom || e.touches.length) return;
+  const dx = e.changedTouches[0].clientX - touchFrom.x, dy = e.changedTouches[0].clientY - touchFrom.y;
+  touchFrom = null;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) dispatchEvent(new KeyboardEvent('keydown', { key: dx < 0 ? 'ArrowRight' : 'ArrowLeft' }));
+}, { passive: true });
 
 const STREET = { F: 1300, H: 4.3 };
 const INK = '#3B342E';
