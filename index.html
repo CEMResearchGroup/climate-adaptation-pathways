@@ -216,7 +216,11 @@ async function switchTo(j, prep) {
   cur = j;
   render();
   if (hadFocus) F[j].focus();
-  await from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }).finished;
+  dissolve = from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' });
+  if (hurry) dissolve.updatePlaybackRate(5);
+  await dissolve.finished;
+  dissolve = null;
+  hurry = false;
   from.classList.remove('on');
   from.getAnimations().forEach(a => a.cancel());
   from.style.zIndex = to.style.zIndex = '';
@@ -228,8 +232,13 @@ async function switchTo(j, prep) {
 }
 const atStart = i => S[i].beat < 0 && !S[i].busy;
 
-const forward = () => { if (!switching && !atEnd()) send(cur, { cmd: 'key', key: 'ArrowRight' }); };
-const backward = () => { if (!switching && !atBegin()) send(cur, { cmd: 'key', key: 'ArrowLeft' }); };
+let dissolve = null, hurry = false;
+function hurrySwitch() {
+  hurry = true;
+  if (dissolve) dissolve.updatePlaybackRate(5);
+}
+const forward = () => { if (switching) hurrySwitch(); else if (!atEnd()) send(cur, { cmd: 'key', key: 'ArrowRight' }); };
+const backward = () => { if (switching) hurrySwitch(); else if (!atBegin()) send(cur, { cmd: 'key', key: 'ArrowLeft' }); };
 const atBegin = () => cur === 0 && atStart(0);
 const atEnd = () => cur === LAST && S[LAST].ended;
 
@@ -298,6 +307,7 @@ addEventListener('message', e => {
     render();
     if (hidden && !m.rewinding) sleep(i);
   }
+  else if ((m.type === 'next' || m.type === 'prev') && switching) hurrySwitch();
   else if (m.type === 'next' && i === cur && cur < LAST) {
     switchTo(cur + 1, () => { if (!atStart(cur + 1)) send(cur + 1, { cmd: 'rewind', to: -1 }); });
   } else if (m.type === 'prev' && i === cur && cur > 0) {

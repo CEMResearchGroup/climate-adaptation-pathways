@@ -164,12 +164,37 @@ const VCLOCK = (() => {
 
 const W = 1920, H = 1080;
 let SPEED = 1;
+const FF = 0.01;
 const D = ms => Math.max(1, ms * SPEED);
 let GEN = 0;
 const NEVER = new Promise(() => {});
-const wait = ms => { const g = GEN; return new Promise(r => setTimeout(() => { if (g === GEN) r(); }, D(ms))); };
-const later = (fn, ms) => { const g = GEN; setTimeout(() => { if (g === GEN) fn(); }, D(ms)); };
+const TIMERS = new Set();
+function timer(fn, ms) {
+  const t = { due: performance.now() + D(ms) };
+  t.run = () => { TIMERS.delete(t); fn(); };
+  t.id = setTimeout(t.run, D(ms));
+  TIMERS.add(t);
+}
+const wait = ms => { const g = GEN; return new Promise(r => timer(() => { if (g === GEN) r(); }, ms)); };
+const later = (fn, ms) => { const g = GEN; timer(() => { if (g === GEN) fn(); }, ms); };
 const $ = (s, el = document) => el.querySelector(s);
+
+const SKIP_HOOKS = [];
+function speedUp() {
+  if (SPEED < 1) return;
+  SPEED = FF;
+  const now = performance.now();
+  for (const t of TIMERS) {
+    clearTimeout(t.id);
+    t.due = now + Math.max(0, t.due - now) * FF;
+    t.id = setTimeout(t.run, Math.max(1, t.due - now));
+  }
+  document.getAnimations().forEach(a => {
+    if (a instanceof CSSAnimation || a instanceof CSSTransition || a.playState !== 'running') return;
+    if (Number.isFinite(a.effect.getComputedTiming().endTime)) a.updatePlaybackRate(a.playbackRate / FF);
+  });
+  SKIP_HOOKS.forEach(f => f(FF));
+}
 
 const EASE = {
   inOut: 'cubic-bezier(.65,0,.35,1)',
@@ -181,6 +206,10 @@ const EASE = {
 };
 
 function tween(el, to, dur, easing = EASE.inOut, delay = 0) {
+  if (SPEED < 1) {
+    const g = GEN;
+    return new Promise(r => timer(() => { if (g === GEN) { Object.assign(el.style, to); r(); } }, dur + delay));
+  }
   const cs = getComputedStyle(el);
   const from = {};
   for (const k of Object.keys(to)) {
@@ -1265,6 +1294,21 @@ function stroll(p, ms, speed = .3) {
   }
 }
 
+SKIP_HOOKS.push(k => {
+  const now = performance.now();
+  for (const p of Object.values(PANES)) {
+    if (!p || !p.street) continue;
+    for (const o of p.street.objs) {
+      for (const t of [o.track, o.fadeTrack, o.openTrack]) {
+        if (!t) continue;
+        const u = Math.min(1, (now - t.t0) / t.dur);
+        t.dur = Math.max(1, t.dur * k);
+        t.t0 = now - u * t.dur;
+      }
+    }
+  }
+});
+
 function frame(now) {
   if (!(typeof ASLEEP !== 'undefined' && ASLEEP)) {
     for (const k of KEYS) {
@@ -1463,6 +1507,8 @@ function buildScene() {
 }
 
 let beat = -1, busy = false, rewinding = false;
+let queued = null;
+let skipping = false;
 let END = false;
 
 function setProgress(ch) {
@@ -1480,9 +1526,12 @@ async function advance() {
   busy = true; report();
   if (b.ch) setProgress(b.ch);
   if (b.run) await b.run();
+  const skipped = skipping;
+  if (skipping) { skipping = false; SPEED = 1; }
   busy = false;
   if (beat === BEATS.length - 1) END = true;
   report();
+  if (skipped && queued) { const f = queued; queued = null; f(); }
 }
 
 function resetScene() {
@@ -1490,7 +1539,7 @@ function resetScene() {
   document.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation) && !(a instanceof CSSTransition)) a.cancel(); });
   Camera.set(CAM.full);
   END = false;
-  beat = -1; busy = false;
+  beat = -1; busy = false; skipping = false;
   buildScene(); setProgress(0);
 }
 async function rewindTo(target) {
@@ -1502,15 +1551,23 @@ async function rewindTo(target) {
   await fin.finished.catch(() => {});
   fd.style.opacity = '1'; fin.cancel();
   resetScene();
-  SPEED = 0.01;
+  SPEED = FF;
   while (beat < target) await advance();
   SPEED = 1;
   fd.style.opacity = '0';
   fd.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 });
   rewinding = false;
   report();
+  if (queued) { const f = queued; queued = null; f(); }
 }
 const back = () => rewindTo(Math.max(-1, beat - 1));
+function skip() {
+  if (skipping) return;
+  skipping = true;
+  speedUp();
+  const b = beat, g = GEN;
+  setTimeout(() => { if (g === GEN && busy && beat === b) rewindTo(b); }, 1000);
+}
 
 function fit() {
   const s = Math.min(innerWidth / W, innerHeight / H);
@@ -1530,18 +1587,18 @@ async function boot() {
   const inBackZone = e => { const r = stage.getBoundingClientRect(); return (e.clientX - r.left) / r.width < 0.3; };
   stage.addEventListener('mousemove', e => stage.classList.toggle('in-back', inBackZone(e)));
   stage.addEventListener('mouseleave', () => stage.classList.remove('in-back'));
-  const fwd = () => { if (ended()) { if (EMBED) embedPost({ type: 'next' }); else rewindTo(-1); } else advance(); };
+  const fwd = () => { if (busy) skip(); else if (ended()) { if (EMBED) embedPost({ type: 'next' }); else rewindTo(-1); } else advance(); };
   const bwd = () => { if (EMBED && beat < 0) embedPost({ type: 'prev' }); else back(); };
+  const go = f => { if (rewinding || skipping) queued = f; else f(); };
   stage.addEventListener('click', e => {
-    if (rewinding || e.target.closest('#controls')) return;
-    if (inBackZone(e)) { bwd(); return; }
+    if (e.target.closest('#controls')) return;
+    if (inBackZone(e)) { go(bwd); return; }
     if (ended() && !EMBED) return;
-    fwd();
+    go(fwd);
   });
   const onKey = key => {
-    if (rewinding) return false;
-    if (['ArrowLeft', 'Backspace', 'PageUp'].includes(key)) { bwd(); return true; }
-    if ([' ', 'Enter', 'ArrowRight', 'PageDown'].includes(key)) { fwd(); return true; }
+    if (['ArrowLeft', 'Backspace', 'PageUp'].includes(key)) { go(bwd); return true; }
+    if ([' ', 'Enter', 'ArrowRight', 'PageDown'].includes(key)) { go(fwd); return true; }
     return false;
   };
   addEventListener('keydown', e => { if (onKey(e.key)) e.preventDefault(); else if (!e.ctrlKey && !e.metaKey && !e.altKey) embedPost({ type: 'key', key: e.key }); });
@@ -1550,7 +1607,8 @@ async function boot() {
     document.body.classList.add('embed');
     addEventListener('message', async e => {
       const m = e.data || {};
-      if (!m.cop31 || rewinding || m.cmd === 'sleep' || m.cmd === 'wake') return;
+      if (!m.cop31 || m.cmd === 'sleep' || m.cmd === 'wake') return;
+      if (rewinding && m.cmd !== 'key') return;
       if (m.cmd === 'rewind') await rewindTo(m.to);
       else if (m.cmd === 'play') { await rewindTo(m.from - 1); advance(); }
       else if (m.cmd === 'key') onKey(m.key);
@@ -1562,7 +1620,7 @@ async function boot() {
   const q = new URLSearchParams(location.search);
   if (q.has('beat')) {
     const target = Math.min(Math.max(0, +q.get('beat') || 0), BEATS.length - 1);
-    SPEED = 0.01;
+    SPEED = FF;
     while (beat < target) await advance();
     SPEED = 1;
   }
